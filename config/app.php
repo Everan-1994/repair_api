@@ -211,4 +211,7 @@ return [
 
     ],
 
+    'xcx_app_id'    => env('XCX_APP_ID'),
+    'xcx_secret'    => env('XCX_SECRET'),
+
 ];

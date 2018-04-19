@@ -45,23 +45,32 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app'),
+            'root'   => storage_path('app'),
+        ],
+
+        'upyun' => [
+            'driver'   => 'upyun',
+            'bucket'   => 'online-repair',// 服务名字
+            'operator' => 'everan1994', // 操作员的名字
+            'password' => 'everan57', // 操作员的密码
+            'domain'   => 'online-repair.test.upcdn.net', // 服务分配的域名
+            'protocol' => 'http', // 服务使用的协议，如需使用 http，在此配置 http
         ],
 
         'public' => [
-            'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'driver'     => 'local',
+            'root'       => storage_path('app/public'),
+            'url'        => env('APP_URL') . '/storage',
             'visibility' => 'public',
         ],
 
         's3' => [
             'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
+            'key'    => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
             'region' => env('AWS_DEFAULT_REGION'),
             'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
+            'url'    => env('AWS_URL'),
         ],
 
     ],

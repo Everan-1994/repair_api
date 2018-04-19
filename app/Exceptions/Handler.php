@@ -31,7 +31,7 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param  \Exception  $exception
+     * @param  \Exception $exception
      * @return void
      */
     public function report(Exception $exception)
@@ -42,19 +42,38 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Exception $exception
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $exception)
     {
-        // 参数验证错误的异常，我们需要返回 400 的 http code 和一句错误信息
-        if ($exception instanceof ValidationException) {
-            return response(['error' => array_first(array_collapse($exception->errors()))], 400);
-        }
-        // 用户认证的异常，我们需要返回 401 的 http code 和错误信息
-        if ($exception instanceof UnauthorizedHttpException) {
-            return response($exception->getMessage(), 401);
+//        // 参数验证错误的异常，我们需要返回 400 的 http code 和一句错误信息
+//        if ($exception instanceof ValidationException) {
+//            return response(['error' => array_first(array_collapse($exception->errors()))], 400);
+//        }
+//        // 用户认证的异常，我们需要返回 401 的 http code 和错误信息
+//        if ($exception instanceof UnauthorizedHttpException) {
+//            return response($exception->getMessage(), 401);
+//        }
+
+        if ($request->is('api/*')) {
+            $response = [];
+            $error = $this->convertExceptionToResponse($exception);
+            $response['status'] = $error->getStatusCode();
+            $response['msg'] = 'something error';
+            if (config('app.debug')) {
+                $response['msg'] = empty($exception->getMessage()) ? 'something error' : $exception->getMessage();
+                if ($error->getStatusCode() >= 500) {
+                    if (config('app.debug')) {
+                        $response['trace'] = $exception->getTraceAsString();
+                        $response['code'] = $exception->getCode();
+                    }
+                }
+            }
+            $response['data'] = [];
+
+            return response()->json($response, $error->getStatusCode());
         }
 
         return parent::render($request, $exception);

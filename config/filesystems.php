@@ -50,11 +50,11 @@ return [
 
         'upyun' => [
             'driver'   => 'upyun',
-            'bucket'   => 'online-repair',// 服务名字
-            'operator' => 'everan1994', // 操作员的名字
-            'password' => 'everan57', // 操作员的密码
-            'domain'   => 'online-repair.test.upcdn.net', // 服务分配的域名
-            'protocol' => 'http', // 服务使用的协议，如需使用 http，在此配置 http
+            'bucket'   => env('UPYUN_BUCKET'),// 服务名字
+            'operator' => env('UPYUN_OPERATOR'), // 操作员的名字
+            'password' => env('UPYUN_PASSWORD'), // 操作员的密码
+            'domain'   => env('UPYUN_DOMAIN'), // 服务分配的域名
+            'protocol' => env('UPYUN_PROTOCOL', 'http'), // 服务使用的协议，如需使用 http，在此配置 http
         ],
 
         'public' => [

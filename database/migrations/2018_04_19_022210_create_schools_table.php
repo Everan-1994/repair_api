@@ -18,6 +18,7 @@ class CreateSchoolsTable extends Migration
             $table->string('logo');
             $table->string('school_name');
             $table->string('school_code')->unique();
+            $table->tinyInteger('status')->default(1);
             $table->tinyInteger('bind')->default(0);
             $table->timestamps();
         });

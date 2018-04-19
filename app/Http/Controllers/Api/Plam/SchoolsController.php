@@ -19,7 +19,12 @@ class SchoolsController extends Controller
 
     public function store(SchoolRequest $schoolRequest, School $school)
     {
-        $sl = $school->create($schoolRequest->all());
+        $sl = $school->create([
+            'logo'        => $schoolRequest->logo,
+            'status'      => $schoolRequest->status,
+            'school_name' => $schoolRequest->school_name,
+            'school_code' => $schoolRequest->school_code,
+        ]);
 
         return new SchoolResource($sl);
     }

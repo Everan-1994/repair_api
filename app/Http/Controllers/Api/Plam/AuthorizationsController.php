@@ -44,4 +44,14 @@ class AuthorizationsController extends Controller
             'expires_in'   => \Auth::guard('api')->factory()->getTTL() * 60
         ]]);
     }
+
+    public function logout()
+    {
+        \Auth::guard('api')->logout();
+
+        return response()->json([
+            'code' => 0,
+            'msg'  => '退出成功'
+        ]);
+    }
 }

@@ -16,6 +16,9 @@ $api->group([
         // 登录
         $api->post('login', 'AuthorizationsController@login')
             ->name('api.authorizations.login');
+        // 退出登陆
+        $api->delete('logout', 'AuthorizationsController@logout')
+            ->name('api.authorizations.index');
     });
 
     $api->group([
@@ -31,7 +34,9 @@ $api->group([
             // 学校列表
             $api->get('school', 'SchoolsController@index')
                 ->name('api.school.index');
-
+            // 新增学校
+            $api->post('school', 'SchoolsController@store')
+                ->name('api.school.store');
         });
 
     });

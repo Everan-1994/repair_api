@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\Plam;
 
-use App\Http\Requests\Plam\SchoolRequest;
-use App\Http\Resources\SchoolResource;
 use App\Models\School;
 use Illuminate\Http\Request;
+use App\Http\Resources\SchoolResource;
 use App\Http\Resources\SchoolCollection;
+use App\Http\Requests\Plam\SchoolRequest;
 
 class SchoolsController extends Controller
 {
@@ -27,5 +27,32 @@ class SchoolsController extends Controller
         ]);
 
         return new SchoolResource($sl);
+    }
+
+    public function update(Request $request, School $school)
+    {
+        $school->fill($request->all());
+        $school->save();
+
+        return response([
+           'code' => 0,
+           'msg' => '更新成功'
+        ]);
+    }
+
+    public function show(School $school)
+    {
+        return new SchoolResource($school);
+    }
+
+    public function destroy(School $school)
+    {
+        $this->authorize('destroy', $school);
+        $school->delete();
+
+        return response([
+            'code' => 0,
+            'msg' => '删除成功'
+        ]);
     }
 }

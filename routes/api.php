@@ -37,6 +37,15 @@ $api->group([
             // 新增学校
             $api->post('school', 'SchoolsController@store')
                 ->name('api.school.store');
+            // 学校信息更新
+            $api->patch('school/{school}', 'SchoolsController@update')
+                ->name('api.school.update');
+            // 学习详情
+            $api->get('school/{school}', 'SchoolsController@show')
+                ->name('api.school.show');
+            // 删除学习
+            $api->delete('school/{school}', 'SchoolsController@destroy')
+                ->name('api.school.destroy');
         });
 
     });

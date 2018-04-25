@@ -55,4 +55,11 @@ class SchoolsController extends Controller
             'msg' => '删除成功'
         ]);
     }
+
+    public function getSchoolList()
+    {
+        $school = School::whereBind(0)->select('id', 'school_name')->get();
+
+        return response($school);
+    }
 }

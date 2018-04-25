@@ -40,12 +40,15 @@ $api->group([
             // 学校信息更新
             $api->patch('school/{school}', 'SchoolsController@update')
                 ->name('api.school.update');
-            // 学习详情
+            // 学校详情
             $api->get('school/{school}', 'SchoolsController@show')
                 ->name('api.school.show');
-            // 删除学习
+            // 删除学校
             $api->delete('school/{school}', 'SchoolsController@destroy')
                 ->name('api.school.destroy');
+            // 下拉选项--学校列表
+            $api->get('getSchoolList', 'SchoolsController@getSchoolList')
+                ->name('api.school.getSchoolList');
         });
 
     });

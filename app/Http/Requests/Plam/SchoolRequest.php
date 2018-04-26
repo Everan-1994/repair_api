@@ -11,7 +11,7 @@ class SchoolRequest extends Request
     {
         return [
             'school_name' => 'required|string',
-            'school_code' => 'required||unique:schools',
+            'school_code' => 'required|unique:schools',
             'logo'        => 'required|string'
         ];
     }

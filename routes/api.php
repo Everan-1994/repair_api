@@ -49,6 +49,12 @@ $api->group([
             // 下拉选项--学校列表
             $api->get('getSchoolList', 'SchoolsController@getSchoolList')
                 ->name('api.school.getSchoolList');
+            // 客户列表
+            $api->get('customer', 'CustomersController@index')
+                ->name('api.customer.index');
+            // 新增客户
+            $api->post('customer', 'CustomersController@store')
+                ->name('api.customer.store');
         });
 
     });

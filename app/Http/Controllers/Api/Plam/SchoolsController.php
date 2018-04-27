@@ -58,7 +58,7 @@ class SchoolsController extends Controller
 
     public function getSchoolList()
     {
-        $school = School::whereBind(0)->select('id', 'school_name')->get();
+        $school = School::select('id', 'school_name', 'bind')->get();
 
         return response($school);
     }

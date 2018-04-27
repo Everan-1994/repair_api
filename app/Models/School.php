@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class School extends Model
 {
     protected $fillable = [
-        'logo', 'school_name', 'school_code', 'bind'
+        'logo', 'school_name', 'school_code', 'bind', 'status'
     ];
 }

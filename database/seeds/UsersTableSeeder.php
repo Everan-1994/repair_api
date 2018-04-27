@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Database\Seeder;
-
 use App\Models\User;
 
 class UsersTableSeeder extends Seeder
@@ -14,7 +13,7 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
         // 创建超级管理员
-        $user = User::create([
+        User::insert([
             'name'     => 'Everan',
             'email'    => 'everan@aliyun.com',
             'phone'    => '18376662410',
@@ -24,6 +23,7 @@ class UsersTableSeeder extends Seeder
         ]);
 
         // 初始化用户角色，将 1 号用户指派为『站长』
+        $user = User::find(1);
         $user->assignRole('Founder');
     }
 }

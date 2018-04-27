@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Plam;
 
 use App\Http\Resources\UserResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AuthorizationsController extends Controller
@@ -29,6 +30,10 @@ class AuthorizationsController extends Controller
 
         $credentials['password'] = $request->password;
 
+        if (!$this->checkStatus($credentials)) {
+            return response(['error' => '账号已被冻结，请联系管理员。'], 400);
+        }
+
         if (!$token = \Auth::guard('api')->attempt($credentials)) {
             return response(['error' => '账号或密码错误'], 400);
         }
@@ -53,5 +58,12 @@ class AuthorizationsController extends Controller
             'code' => 0,
             'msg'  => '退出成功'
         ]);
+    }
+
+    public function checkStatus($map)
+    {
+        $map['status'] = 1;
+
+        return \Auth::attempt($map);
     }
 }

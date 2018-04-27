@@ -52,9 +52,15 @@ $api->group([
             // 客户列表
             $api->get('customer', 'CustomersController@index')
                 ->name('api.customer.index');
+            // 客户信息
+            $api->get('customer/{user}', 'CustomersController@show')
+                ->name('api.customer.show');
             // 新增客户
             $api->post('customer', 'CustomersController@store')
                 ->name('api.customer.store');
+            // 更新客户
+            $api->patch('customer/{user}', 'CustomersController@update')
+                ->name('api.customer.update');
         });
 
     });

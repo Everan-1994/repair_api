@@ -14,8 +14,10 @@ class UserResource extends Resource
     public function toArray($request)
     {
         return [
+            'id'        => $this->id,
             'name'      => $this->name,
             'email'     => $this->email,
+            'school'    => new SchoolResource($this->whenLoaded('school')),
             'school_id' => $this->school_id,
             'phone'     => $this->phone ? true : false,
             'avatar'    => $this->avatar,

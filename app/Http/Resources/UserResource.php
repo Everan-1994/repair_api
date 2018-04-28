@@ -19,7 +19,7 @@ class UserResource extends Resource
             'email'     => $this->email,
             'school'    => new SchoolResource($this->whenLoaded('school')),
             'school_id' => $this->school_id,
-            'phone'     => $this->phone ? true : false,
+            'phone'     => $this->when(!empty($this->phone), $this->phone),
             'avatar'    => $this->avatar,
             'identify'  => $this->identify,
             'status'    => $this->status

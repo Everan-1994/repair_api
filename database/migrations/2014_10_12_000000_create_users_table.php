@@ -16,6 +16,7 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->tinyInteger('sex')->default('1');
             $table->string('email')->unique()->nullable();
             $table->string('phone')->unique()->nullable();
             $table->string('password');
@@ -24,7 +25,8 @@ class CreateUsersTable extends Migration
             $table->string('notice_count')->default(0)->comment('消息数');
             $table->tinyInteger('status')->default(1)->comment('状态');
             $table->string('openid')->unique()->nullable();
-            $table->string('avatar')->default('https://lccdn.phphub.org/uploads/images/201803/08/1/wqAQ09GdPM.png?imageView2/2/w/100/h/0');
+            $table->string('weixin_session_key')->nullable();
+            $table->string('avatar')->nullable();
             $table->string('address')->nullable();
             $table->rememberToken();
             $table->timestamps();

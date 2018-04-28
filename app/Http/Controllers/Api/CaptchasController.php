@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Plam;
+namespace App\Http\Controllers\Api;
 
 use Gregwar\Captcha\CaptchaBuilder;
 use Illuminate\Http\Request;

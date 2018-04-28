@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Api\Plam;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\Api\WeappAuthorizationRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -45,6 +46,42 @@ class AuthorizationsController extends Controller
         // 使用 Auth 登录用户
         return (new UserResource(\Auth::guard('api')->user()))->additional(['meta' => [
             'access_token' => $token,
+            'token_type'   => 'Bearer',
+            'expires_in'   => \Auth::guard('api')->factory()->getTTL() * 60
+        ]]);
+    }
+
+    // 小程序登录
+    public function weappStore(WeappAuthorizationRequest $request)
+    {
+        $code = $request->code;
+
+        // 根据 code 获取微信 openid 和 session_key
+        $miniProgram = \EasyWeChat::miniProgram();
+        $data = $miniProgram->auth->session($code);
+
+        // 如果结果错误，说明 code 已过期或不正确，返回 401 错误
+        if (isset($data['errcode'])) {
+            return response(['error' => 'code 无效'], 401);
+        }
+
+        // 找到 openid 对应的用户 找不到则创建
+        $user = User::firstOrCreate(['openid' => $data['openid']]);
+
+        $attributes['weixin_session_key'] = $data['session_key'];
+
+        if ($user['status'] != 1) {
+            return response(['error' => '账号已被冻结，请联系管理员。'], 400);
+        }
+
+        // 更新用户数据
+        $user->update($attributes);
+
+        // 记录登入日志
+        // event(new LoginEvent(\Auth::guard('api')->user(), new Agent(), $request->getClientIp()));
+
+        return (new UserResource($user))->additional(['meta' => [
+            'access_token' => Auth::guard('api')->fromUser($user),
             'token_type'   => 'Bearer',
             'expires_in'   => \Auth::guard('api')->factory()->getTTL() * 60
         ]]);

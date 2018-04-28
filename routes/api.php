@@ -4,7 +4,7 @@ $api = app('Illuminate\Routing\Router');
 
 // 后台API
 $api->group([
-    'namespace'  => 'Api\Plam',
+    'namespace'  => 'Api',
 ], function ($api) {
 
     $api->group([
@@ -16,6 +16,9 @@ $api->group([
         // 登录
         $api->post('login', 'AuthorizationsController@login')
             ->name('api.authorizations.login');
+        // 小程序登录
+        $api->post('weapp/authorizations', 'AuthorizationsController@weappStore')
+            ->name('api.weapp.authorizations.store');
         // 退出登陆
         $api->delete('logout', 'AuthorizationsController@logout')
             ->name('api.authorizations.index');
@@ -64,7 +67,4 @@ $api->group([
         });
 
     });
-
 });
-
-// 小程序API

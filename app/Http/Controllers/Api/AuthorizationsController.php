@@ -66,7 +66,17 @@ class AuthorizationsController extends Controller
         }
 
         // 找到 openid 对应的用户 找不到则创建
-        $user = User::firstOrCreate(['openid' => $data['openid']]);
+        $user = User::whereOpenid($data['openid'])->first();
+
+        if (!$user) {
+            $user = User::create([
+                'name'     => $request->nickname,
+                'sex'      => $request->sex,
+                'avatar'   => $request->avatar,
+                'password' => bcrypt('Everan9457'),
+                'openid'   => $data['openid'],
+            ]);
+        }
 
         $attributes['weixin_session_key'] = $data['session_key'];
 
@@ -81,8 +91,7 @@ class AuthorizationsController extends Controller
         // event(new LoginEvent(\Auth::guard('api')->user(), new Agent(), $request->getClientIp()));
 
         return (new UserResource($user))->additional(['meta' => [
-            'access_token' => Auth::guard('api')->fromUser($user),
-            'token_type'   => 'Bearer',
+            'access_token' => 'Bearer ' . \Auth::guard('api')->fromUser($user),
             'expires_in'   => \Auth::guard('api')->factory()->getTTL() * 60
         ]]);
     }

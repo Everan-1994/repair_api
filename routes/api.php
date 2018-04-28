@@ -64,6 +64,9 @@ $api->group([
             // 更新客户
             $api->patch('customer/{user}', 'CustomersController@update')
                 ->name('api.customer.update');
+            // 获取个人信息
+            $api->get('user', 'UsersController@info')
+                ->name('api.user.info');
         });
 
     });

@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'PRC',
+    'timezone' => 'UTC',
 
     /*
     |--------------------------------------------------------------------------
@@ -210,8 +210,5 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
     ],
-
-    'xcx_app_id'    => env('XCX_APP_ID'),
-    'xcx_secret'    => env('XCX_SECRET'),
 
 ];

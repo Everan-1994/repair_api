@@ -50,7 +50,7 @@ return [
 
         'upyun' => [
             'driver'   => 'upyun',
-            'bucket'   => env('UPYUN_BUCKET'),// 服务名字
+            'bucket'   => env('UPYUN_BUCKET'), // 服务名字
             'operator' => env('UPYUN_OPERATOR'), // 操作员的名字
             'password' => env('UPYUN_PASSWORD'), // 操作员的密码
             'domain'   => env('UPYUN_DOMAIN'), // 服务分配的域名

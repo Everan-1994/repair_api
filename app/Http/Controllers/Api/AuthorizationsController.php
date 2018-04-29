@@ -73,6 +73,7 @@ class AuthorizationsController extends Controller
                 'name'     => $request->nickname,
                 'sex'      => $request->sex,
                 'avatar'   => $request->avatar,
+                'status'   => 1,
                 'password' => bcrypt('Everan9457'),
                 'openid'   => $data['openid'],
             ]);
@@ -80,7 +81,7 @@ class AuthorizationsController extends Controller
 
         $attributes['weixin_session_key'] = $data['session_key'];
 
-        if ($user['status'] != 1) {
+        if ($user['status'] !== 1) {
             return response(['error' => '账号已被冻结，请联系管理员。'], 400);
         }
 

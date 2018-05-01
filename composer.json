@@ -11,6 +11,7 @@
         "jellybool/flysystem-upyun": "^1.0",
         "laravel/framework": "5.6.*",
         "laravel/tinker": "^1.0",
+        "overtrue/easy-sms": "^1.0",
         "overtrue/laravel-wechat": "~4.0",
         "spatie/laravel-permission": "^2.11",
         "tymon/jwt-auth": "^1.0.0-rc.1"

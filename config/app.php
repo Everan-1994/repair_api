@@ -151,6 +151,7 @@ return [
          * Package Service Providers...
          */
         JellyBool\Flysystem\Upyun\UpyunServiceProvider::class,
+        App\Providers\EasySmsServiceProvider::class,
         /*
          * Application Service Providers...
          */

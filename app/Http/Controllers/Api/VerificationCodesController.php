@@ -13,13 +13,13 @@ class VerificationCodesController extends Controller
         $captchaData = cache()->get($request->captcha_key);
 
         if (!$captchaData) {
-            return response(['msg' => '验证码无效']);
+            throw new \Exception('验证码无效', 422);
         }
 
         if (!hash_equals($captchaData['code'], $request->captcha_code)) {
             // 验证错误就清缓存
             cache()->forget($request->captcha_key);
-            return response(['msg' => '验证码错误']);
+            throw new \Exception('验证码错误', 401);
         }
 
         $phone = $captchaData['phone'];
@@ -41,7 +41,7 @@ class VerificationCodesController extends Controller
             } catch (\GuzzleHttp\Exception\ClientException $exception) {
                 $response = $exception->getResponse();
                 $result = json_decode($response->getBody()->getContents(), true);
-                return response(['msg' => $result['msg'] ?: '短信发送异常']);
+                throw new \Exception($result['msg'] ?: '短信发送异常');
             }
         }
 
@@ -62,12 +62,12 @@ class VerificationCodesController extends Controller
         $verifyData = cache()->get($request->verification_key);
 
         if (!$verifyData) {
-            return response(['msg' => '验证码已失效']);
+            throw new \Exception('验证码已失效', 422);
         }
 
         if (!hash_equals($verifyData['code'], $request->verification_code)) {
             // 返回401
-            return response(['msg' => '验证码错误']);
+            throw new \Exception('验证码错误', 401);
         }
 
         return response([

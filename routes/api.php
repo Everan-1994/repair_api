@@ -8,7 +8,7 @@ $api->group([
 ], function ($api) {
 
     $api->group([
-        'middleware' => 'throttle: 10, 1', // 调用接口限制 1分钟10次
+        'middleware' => 'throttle: 20, 1', // 调用接口限制 1分钟10次
     ], function ($api) {
         // 图片验证码
         $api->get('captchas/{captcha_key}', 'CaptchasController@store')

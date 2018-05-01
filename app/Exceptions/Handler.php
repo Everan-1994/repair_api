@@ -3,8 +3,8 @@
 namespace App\Exceptions;
 
 use Exception;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class Handler extends ExceptionHandler
@@ -49,35 +49,44 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
 
-        if ($request->is('api/*')) {
-            $response = [];
-            $error = $this->convertExceptionToResponse($exception);
-            $response['status'] = $error->getStatusCode();
-            $response['msg'] = 'something error';
-            if (config('app.debug')) {
-                $response['msg'] = empty($exception->getMessage()) ? 'something error' : $exception->getMessage();
-                if ($error->getStatusCode() >= 500) {
-                    if (config('app.debug')) {
-                        $response['trace'] = $exception->getTraceAsString();
-                        $response['code'] = $exception->getCode();
-                    }
-                }
-            }
+//        if ($request->is('api/*')) {
+//            $response = [];
+//            $error = $this->convertExceptionToResponse($exception);
+//            $response['status'] = $error->getStatusCode();
+//            $response['msg'] = 'something error';
+//            if (config('app.debug')) {
+//                $response['msg'] = empty($exception->getMessage()) ? 'something error' : $exception->getMessage();
+//                if ($error->getStatusCode() >= 500) {
+//                    if (config('app.debug')) {
+//                        $response['trace'] = $exception->getTraceAsString();
+//                        $response['code'] = $exception->getCode();
+//                    }
+//                }
+//            }
+//
+//            // 参数验证错误的异常，我们需要返回 400 的 http code 和一句错误信息
+//            if ($exception instanceof ValidationException) {
+//                $response['msg'] = array_first(array_collapse($exception->errors()));
+//                $response['status'] = 400;
+//            }
+//            // 用户认证的异常，我们需要返回 401 的 http code 和错误信息
+//            if ($exception instanceof UnauthorizedHttpException) {
+//                $response['msg'] = $exception->getMessage();
+//                $response['status'] = 401;
+//            }
+//
+//            $response['data'] = [];
+//
+//            return response()->json($response, $error->getStatusCode());
+//        }
 
-            // 参数验证错误的异常，我们需要返回 400 的 http code 和一句错误信息
-            if ($exception instanceof ValidationException) {
-                $response['msg'] = array_first(array_collapse($exception->errors()));
-                $response['status'] = 400;
-            }
-            // 用户认证的异常，我们需要返回 401 的 http code 和错误信息
-            if ($exception instanceof UnauthorizedHttpException) {
-                $response['msg'] = $exception->getMessage();
-                $response['status'] = 401;
-            }
-
-            $response['data'] = [];
-
-            return response()->json($response, $error->getStatusCode());
+        // 参数验证错误的异常，我们需要返回 422 的 http code 和一句错误信息
+        if ($exception instanceof ValidationException) {
+            return response($exception->errors(), 400);
+        }
+        // 用户认证的异常，我们需要返回 401 的 http code 和错误信息
+        if ($exception instanceof UnauthorizedHttpException) {
+            return response($exception->getMessage(), 401);
         }
 
         return parent::render($request, $exception);

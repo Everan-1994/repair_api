@@ -13,13 +13,13 @@ class VerificationCodesController extends Controller
         $captchaData = cache()->get($request->captcha_key);
 
         if (!$captchaData) {
-            throw new \Exception('验证码无效', 422);
+            return response(['captchaError' => '验证码无效'], 400);
         }
 
         if (!hash_equals($captchaData['code'], $request->captcha_code)) {
             // 验证错误就清缓存
             cache()->forget($request->captcha_key);
-            throw new \Exception('验证码错误', 401);
+            return response(['captchaError' => '验证码错误'], 401);
         }
 
         $phone = $captchaData['phone'];

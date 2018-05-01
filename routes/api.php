@@ -13,6 +13,9 @@ $api->group([
         // 图片验证码
         $api->get('captchas/{captcha_key}', 'CaptchasController@store')
             ->name('api.captchas.store');
+        // 短信验证码
+        $api->post('verificationCodes', 'VerificationCodesController@store')
+            ->name('api.verificationCodes.store');
         // 登录
         $api->post('login', 'AuthorizationsController@login')
             ->name('api.authorizations.login');

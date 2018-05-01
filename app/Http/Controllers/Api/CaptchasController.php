@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use Gregwar\Captcha\CaptchaBuilder;
 use Illuminate\Http\Request;
+use Gregwar\Captcha\CaptchaBuilder;
 
 class CaptchasController extends Controller
 {

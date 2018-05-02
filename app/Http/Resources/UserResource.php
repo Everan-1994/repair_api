@@ -22,7 +22,8 @@ class UserResource extends Resource
             'phone'     => $this->when(!empty($this->phone), $this->phone),
             'avatar'    => $this->avatar,
             'identify'  => $this->identify,
-            'status'    => $this->status
+            'status'    => $this->status,
+            'address'   => $this->address
         ];
     }
 }

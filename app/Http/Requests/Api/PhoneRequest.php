@@ -9,14 +9,14 @@ class PhoneRequest extends Request
     public function rules()
     {
         return [
-            'phone' => 'required|regex:/^1[3456789]\d{9}$/|unique:users',
+            'phone' => 'required',
         ];
     }
 
     public function messages()
     {
         return [
-            'phone.unique' => '手机号码已被使用'
+            'phone.required' => '手机号不能为空'
         ];
     }
 }

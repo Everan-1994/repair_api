@@ -54,6 +54,17 @@ class CustomersController extends Controller
 
     public function weappUserUpdate(Request $request)
     {
+        $verifyData = \Cache::get($request->verification_key);
+
+        if (!$verifyData) {
+            return response(['error' => '验证码失效'], 422);
+        }
+
+        if (!hash_equals($verifyData['code'], $request->phone_code)) {
+            // 返回401
+            return response(['error' => '验证码错误'], 401);
+        }
+
         $code = $request->code;
 
         // 根据 code 获取微信 openid 和 session_key
@@ -66,9 +77,11 @@ class CustomersController extends Controller
         }
 
         $info = [
-            'name'       => $request->nickname,
+            'name'       => $request->name,
+            'phone'      => $request->phone,
             'sex'        => $request->sex,
             'avatar'     => $request->avatar,
+            'address'    => $request->address,
             'updated_at' => now()->toDateTimeString()
         ];
 
@@ -78,8 +91,9 @@ class CustomersController extends Controller
         if (!empty($request->school_id)) {
             $info['school_id'] = $request->school_id;
         }
+
         // 找到 openid 对应的用户
-        User::whereOpenid($data['openid'])->update([$info]);
+        User::whereOpenid($data['openid'])->update($info);
 
         return new UserResource(User::whereOpenid($data['openid'])->with('school')->first());
     }

@@ -41,7 +41,7 @@ class VerificationCodesController extends Controller
             } catch (\GuzzleHttp\Exception\ClientException $exception) {
                 $response = $exception->getResponse();
                 $result = json_decode($response->getBody()->getContents(), true);
-                throw new \Exception($result['msg'] ?: '短信发送异常');
+                return response(['error' => $result['msg'] ?: '短信发送异常'], 500);
             }
         }
 
@@ -57,21 +57,4 @@ class VerificationCodesController extends Controller
         ]);
     }
 
-//    public function verifPhoneCode(Request $request)
-//    {
-//        $verifyData = cache()->get($request->verification_key);
-//
-//        if (!$verifyData) {
-//            throw new \Exception('验证码已失效', 422);
-//        }
-//
-//        if (!hash_equals($verifyData['code'], $request->verification_code)) {
-//            // 返回401
-//            throw new \Exception('验证码错误', 401);
-//        }
-//
-//        return response([
-//            'msg' => 'Success'
-//        ]);
-//    }
 }

@@ -73,6 +73,9 @@ $api->group([
             // 获取个人信息
             $api->get('user', 'UsersController@info')
                 ->name('api.user.info');
+            // 小程序用户更新
+            $api->put('customer', 'CustomersController@weappUserUpdate')
+                ->name('api.customer.weappUserUpdate');
         });
 
     });

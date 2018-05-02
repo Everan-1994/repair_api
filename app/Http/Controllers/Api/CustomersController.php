@@ -51,4 +51,36 @@ class CustomersController extends Controller
             'msg'  => '更新成功'
         ]);
     }
+
+    public function weappUserUpdate(Request $request)
+    {
+        $code = $request->code;
+
+        // 根据 code 获取微信 openid 和 session_key
+        $miniProgram = \EasyWeChat::miniProgram();
+        $data = $miniProgram->auth->session($code);
+
+        // 如果结果错误，说明 code 已过期或不正确，返回 401 错误
+        if (isset($data['errcode'])) {
+            return response(['error' => 'code 无效'], 401);
+        }
+
+        $info = [
+            'name'       => $request->nickname,
+            'sex'        => $request->sex,
+            'avatar'     => $request->avatar,
+            'updated_at' => now()->toDateTimeString()
+        ];
+
+        if (!empty($request->phone)) {
+            $info['phone'] = $request->phone;
+        }
+        if (!empty($request->school_id)) {
+            $info['school_id'] = $request->school_id;
+        }
+        // 找到 openid 对应的用户
+        User::whereOpenid($data['openid'])->update([$info]);
+
+        return new UserResource(User::whereOpenid($data['openid'])->with('school')->first());
+    }
 }

@@ -73,9 +73,16 @@ $api->group([
             // 获取个人信息
             $api->get('user', 'UsersController@info')
                 ->name('api.user.info');
+            // 区域列表
+            $api->get('area', 'AreasController@index')
+                ->name('api.area.index');
+            // 新增区域
+            $api->post('area', 'AreasController@store')
+                ->name('api.area.store');
             // 小程序用户更新
             $api->put('customer', 'CustomersController@weappUserUpdate')
                 ->name('api.customer.weappUserUpdate');
+
         });
 
     });

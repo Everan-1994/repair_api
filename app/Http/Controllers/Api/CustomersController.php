@@ -78,18 +78,30 @@ class CustomersController extends Controller
 
         $info = [
             'name'       => $request->name,
-            'phone'      => $request->phone,
             'sex'        => $request->sex,
             'avatar'     => $request->avatar,
             'address'    => $request->address,
+            'school_id'  => $request->school_id,
             'updated_at' => now()->toDateTimeString()
         ];
 
         if (!empty($request->phone)) {
-            $info['phone'] = $request->phone;
-        }
-        if (!empty($request->school_id)) {
-            $info['school_id'] = $request->school_id;
+            // 验证规则
+            $rules = [
+                'phone' => [
+                    'regex:/^1[3456789]\d{9}$/',
+                    'unique:users'
+                ]
+            ];
+
+            $messages = [
+                'phone.regex'  => '手机格式不正确',
+                'phone.unique' => '手机号码已被使用',
+            ];
+
+            // 验证参数，如果验证失败，则会抛出 ValidationException 的异常
+            $params = $this->validate($request, $rules, $messages);
+            $info['phone'] = $params['phone'];
         }
 
         // 找到 openid 对应的用户

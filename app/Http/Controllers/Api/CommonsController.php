@@ -9,7 +9,7 @@ class CommonsController extends Controller
 {
     public function upload(Request $request)
     {
-        $result = Storage::disk('upyun')->put('/', $request->file('logo'));
+        $result = Storage::disk('upyun')->put('/', $request->file('images'));
 
         return response()->json([
             'code' => 0,

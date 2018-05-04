@@ -28,6 +28,7 @@ class CreateUsersTable extends Migration
             $table->string('weixin_session_key')->nullable();
             $table->string('avatar')->nullable();
             $table->string('address')->nullable();
+            $table->tinyInteger('is_repair')->default(0)->comment('维修员：0-否、1-是');
             $table->rememberToken();
             $table->timestamps();
         });

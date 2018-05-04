@@ -76,12 +76,18 @@ $api->group([
             // 区域列表
             $api->get('area', 'AreasController@index')
                 ->name('api.area.index');
+            // 获取学校区域
+            $api->get('area/select', 'AreasController@areaList')
+                ->name('api.area.areaList');
             // 新增区域
             $api->post('area', 'AreasController@store')
                 ->name('api.area.store');
             // 小程序用户更新
             $api->put('customer', 'CustomersController@weappUserUpdate')
                 ->name('api.customer.weappUserUpdate');
+            // 提交申报
+            $api->post('order', 'OrdersController@store')
+                ->name('api.order.store');
 
         });
 

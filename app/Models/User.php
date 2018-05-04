@@ -20,7 +20,8 @@ class User extends Authenticatable implements JWTSubject
         'name', 'email', 'password',
         'school_id', 'avatar', 'status',
         'phone', 'identify', 'notice_count',
-        'address', 'openid', 'weixin_session_key'
+        'address', 'openid', 'weixin_session_key',
+        'is_repair'
     ];
 
     /**

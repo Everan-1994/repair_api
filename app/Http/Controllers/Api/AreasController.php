@@ -27,4 +27,11 @@ class AreasController extends Controller
 
         return new AreaResource($area);
     }
+
+    public function areaList(Request $request)
+    {
+        $area = Area::whereSchoolId($request->school_id)->whereStatus(1)->select('id', 'name')->get();
+
+        return response($area);
+    }
 }

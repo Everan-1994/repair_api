@@ -88,7 +88,9 @@ $api->group([
             // 提交申报
             $api->post('order', 'OrdersController@store')
                 ->name('api.order.store');
-
+            // 提交申报
+            $api->get('order', 'OrdersController@getAllOrder')
+                ->name('api.order.getAllOrder');
         });
 
     });

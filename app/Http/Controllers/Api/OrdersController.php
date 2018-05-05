@@ -15,7 +15,7 @@ class OrdersController extends Controller
         $order = Order::whereSchoolId($request->school_id)
             ->with(['area', 'images', 'user'])
             ->orderBy('created_at', 'desc')
-            ->paginate(5, ['*'], 'page', $request->page ?: 1);
+            ->paginate(10, ['*'], 'page', $request->page ?: 1);
 
         return OrderResource::collection($order);
     }

@@ -31,7 +31,7 @@ $api->group([
     });
 
     $api->group([
-        'middleware' => 'throttle: 60, 1', // 调用接口限制 1分钟60次
+        'middleware' => 'throttle: 120, 1', // 调用接口限制 1分钟60次
     ], function ($api) {
         // 游客可以访问的api
 

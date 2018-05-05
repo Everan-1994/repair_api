@@ -4,7 +4,7 @@ $api = app('Illuminate\Routing\Router');
 
 // 后台API
 $api->group([
-    'namespace'  => 'Api',
+    'namespace' => 'Api',
 ], function ($api) {
 
     $api->group([
@@ -32,7 +32,7 @@ $api->group([
 
     $api->group([
         'middleware' => 'throttle: 60, 1', // 调用接口限制 1分钟60次
-    ], function($api) {
+    ], function ($api) {
         // 游客可以访问的api
 
         // 需要 token 验证的接口
@@ -88,9 +88,12 @@ $api->group([
             // 提交申报
             $api->post('order', 'OrdersController@store')
                 ->name('api.order.store');
-            // 提交申报
-            $api->get('order', 'OrdersController@getAllOrder')
-                ->name('api.order.getAllOrder');
+            // 获取申报列表
+            $api->get('orders', 'OrdersController@index')
+                ->name('api.order.index');
+            // 获取申报详情
+            $api->get('orders/{order}', 'OrdersController@show')
+                ->name('api.order.show');
         });
 
     });

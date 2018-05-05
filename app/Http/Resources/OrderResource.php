@@ -2,31 +2,26 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\JsonResource;
 
-class OrderResource extends JsonResource
+class OrderResource extends Resource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return array
-     */
     public function toArray($request)
     {
         return [
             'id'             => $this->id,
             'order'          => $this->order,
             'type'           => $this->type,
-            'area_id'        => $this->area_id,
+            'school_id'      => $this->school_id,
+            'area'           => $this->whenLoaded('area'),
             'address'        => $this->address,
             'content'        => $this->content,
-            'user_id'        => $this->user_id,
+            'user'           => $this->whenLoaded('user'),
+            'images'         => $this->whenLoaded('images'),
             'repair_id'      => $this->repair_id,
-            'assess'         => $this->assess,
-            'assess_content' => $this->assess_content,
+            'access'         => $this->access,
+            'access_content' => $this->access_content,
             'status'         => $this->status,
-            'created_at'     => $this->created_at
+            'created_at'     => $this->created_at->toDateTimeString()
         ];
     }
 }

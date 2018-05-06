@@ -71,6 +71,6 @@ class OrdersController extends Controller
 
     public function show(Order $order)
     {
-        return new OrderResource($order);
+        return new OrderResource($order->whereId($order['id'])->with(['user', 'images', 'area'])->first());
     }
 }

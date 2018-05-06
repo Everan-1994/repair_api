@@ -57,7 +57,7 @@ class CustomersController extends Controller
         $verifyData = \Cache::get($request->verification_key);
 
         if (!$verifyData) {
-            return response(['error' => '验证码失效'], 422);
+            return response(['error' => '验证码失效'], 400);
         }
 
         if (!hash_equals($verifyData['code'], $request->phone_code)) {

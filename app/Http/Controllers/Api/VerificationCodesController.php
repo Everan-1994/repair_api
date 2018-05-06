@@ -19,7 +19,7 @@ class VerificationCodesController extends Controller
         if (!hash_equals($captchaData['code'], $request->captcha_code)) {
             // 验证错误就清缓存
             cache()->forget($request->captcha_key);
-            return response(['captchaError' => '验证码错误'], 401);
+            return response(['captchaError' => '验证码错误'], 422);
         }
 
         $phone = $captchaData['phone'];

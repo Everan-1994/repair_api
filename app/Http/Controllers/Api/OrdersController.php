@@ -17,7 +17,7 @@ class OrdersController extends Controller
             ->when(isset($request->status), function ($query) use ($request) {
                 return $query->whereStatus($request->status);
             })
-            ->when(isset($request->self), function ($query) {
+            ->when($request->self == 1, function ($query) {
                 return $query->whereUserId(\Auth::id());
             })
             ->orderBy('created_at', 'desc')

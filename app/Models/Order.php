@@ -26,7 +26,7 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id')
-            ->select('id', 'name', 'sex', 'avatar');
+            ->select('id', 'name', 'sex', 'avatar', 'address');
     }
 
     public function processes()

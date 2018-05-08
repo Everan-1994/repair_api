@@ -14,6 +14,12 @@ class OrdersController extends Controller
     {
         $order = Order::whereSchoolId($request->school_id)
             ->with(['area', 'images', 'user'])
+            ->when(isset($request->status), function ($query) use ($request) {
+                return $query->whereStatus($request->status);
+            })
+            ->when(isset($request->self), function ($query) {
+                return $query->whereUserId(\Auth::id());
+            })
             ->orderBy('created_at', 'desc')
             ->paginate(5, ['*'], 'page', $request->page ?: 1);
 

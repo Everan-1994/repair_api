@@ -12,13 +12,15 @@ class OrdersController extends Controller
 {
     public function index(Request $request)
     {
+        $user_id = \Auth::id();
+
         $order = Order::whereSchoolId($request->school_id)
             ->with(['area', 'images', 'user'])
             ->when(isset($request->status), function ($query) use ($request) {
                 return $query->whereStatus($request->status);
             })
-            ->when($request->self == 1, function ($query) {
-                return $query->whereUserId(\Auth::id());
+            ->when($request->self == 1, function ($query) use ($user_id) {
+                return $query->whereUserId($user_id);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(5, ['*'], 'page', $request->page ?: 1);

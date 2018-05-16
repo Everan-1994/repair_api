@@ -22,8 +22,8 @@ class OrdersController extends Controller
             ->when($request->self == 1, function ($query) use ($user_id) {
                 return $query->whereUserId($user_id);
             })
-            ->orderBy('created_at', 'desc')
-            ->paginate(5, ['*'], 'page', $request->page ?: 1);
+            ->orderBy($request->created_at ?: 'created_at', $request->desc ?: 'desc')
+            ->paginate($request->pageSize ?: 5, ['*'], 'page', $request->page ?: 1);
 
         return OrderResource::collection($order);
     }

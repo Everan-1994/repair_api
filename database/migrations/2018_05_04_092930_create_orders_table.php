@@ -23,9 +23,9 @@ class CreateOrdersTable extends Migration
             $table->string('content')->comment('申报事项');
             $table->unsignedInteger('user_id')->index()->comment('申报者id');
             $table->integer('repair_id')->index()->default(0)->comment('维修员id');
-            $table->tinyInteger('assess')->default(0)->comment('评价：0-位评价、1-好评、2-中评、3-差评');
+            $table->tinyInteger('assess')->default(0)->comment('评价：0-未评价、1-好评、2-中评、3-差评');
             $table->string('assess_content')->nullable()->comment('评价内容');
-            $table->tinyInteger('status')->default(0)->comment('工单状态：0-申报、1-审核、2-派工、3-完工、4-申诉(调回第一步)');
+            $table->tinyInteger('status')->default(0)->comment('工单状态：0-驳回、1-审核、2-派工、3-完工、4-申诉(调回第一步)');
             $table->timestamps();
         });
     }

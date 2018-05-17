@@ -16,6 +16,7 @@ class SeedRolesAndPermissionsData extends Migration
         // 先创建权限
         Permission::create(['name' => 'manage_users']);
         Permission::create(['name' => 'settings']);
+        Permission::create(['name' => 'manage_orders']);
 
         // 创建站长角色，并赋予权限
         $founder = Role::create(['name' => 'Founder']);
@@ -25,6 +26,10 @@ class SeedRolesAndPermissionsData extends Migration
         // 创建管理员角色，并赋予权限
         $maintainer = Role::create(['name' => 'Maintainer']);
         $maintainer->givePermissionTo('settings');
+
+        // 创建客户角色
+        $maintainer = Role::create(['name' => 'Customer']);
+        $maintainer->givePermissionTo('manage_orders');
     }
 
     public function down()

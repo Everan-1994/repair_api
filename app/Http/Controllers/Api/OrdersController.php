@@ -7,6 +7,8 @@ use App\Models\OrderImages;
 use Illuminate\Http\Request;
 use App\Http\Resources\OrderResource;
 use App\Http\Requests\Api\OrderRequest;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class OrdersController extends Controller
 {
@@ -21,6 +23,9 @@ class OrdersController extends Controller
             })
             ->when($request->self == 1, function ($query) use ($user_id) {
                 return $query->whereUserId($user_id);
+            })
+            ->when(!is_null($request->type), function ($query) use ($request) {
+                return $query->whereType($request->type);
             })
             ->orderBy($request->created_at ?: 'created_at', $request->desc ?: 'desc')
             ->paginate($request->pageSize ?: 5, ['*'], 'page', $request->page ?: 1);
@@ -79,6 +84,17 @@ class OrdersController extends Controller
 
     public function show(Order $order)
     {
-        return new OrderResource($order->whereId($order['id'])->with(['user', 'images', 'area'])->first());
+        return new OrderResource($order->whereId($order['id'])->with(['user', 'repair', 'images', 'area', 'processes'])->first());
+    }
+
+    public function del(Order $order)
+    {
+        $this->authorize('destroy', $order);
+        $order->delete();
+
+        return response([
+            'code' => 0,
+            'msg' => 'Successed'
+        ], 200);
     }
 }

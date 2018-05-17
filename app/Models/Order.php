@@ -23,15 +23,26 @@ class Order extends Model
             ->select('id', 'image_url', 'order_id');
     }
 
+    /**
+     * 申报者信息
+     */
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id')
             ->select('id', 'name', 'sex', 'avatar', 'address');
     }
 
+    /**
+     * 维修员信息
+     */
+    public function repair()
+    {
+        return $this->belongsTo(User::class, 'repair_id', 'id')
+            ->select('id', 'name', 'sex', 'avatar');
+    }
+
     public function processes()
     {
-        return $this->hasMany(OrderProcess::class, 'order_id', 'id')
-            ->select('id', 'type', 'order_id');
+        return $this->hasMany(OrderProcess::class, 'order_id', 'id');
     }
 }

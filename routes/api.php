@@ -94,9 +94,13 @@ $api->group([
             // 获取申报详情
             $api->get('orders/{order}', 'OrdersController@show')
                 ->name('api.order.show');
+            // 删除申报
+            $api->delete('orders/{order}', 'OrdersController@del')
+                ->name('api.order.del');
             // 获取用户列表
             $api->get('member', 'MembersController@index')
                 ->name('api.member.index');
+
         });
 
     });

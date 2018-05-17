@@ -43,6 +43,7 @@ class Order extends Model
 
     public function processes()
     {
-        return $this->hasMany(OrderProcess::class, 'order_id', 'id');
+        return $this->hasMany(OrderProcess::class, 'order_id', 'id')
+            ->orderBy('type', 'asc');
     }
 }

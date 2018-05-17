@@ -97,6 +97,9 @@ $api->group([
             // 删除申报
             $api->delete('orders/{order}', 'OrdersController@del')
                 ->name('api.order.del');
+            // 申报回复
+            $api->put('processes', 'OrdersController@replies')
+                ->name('api.order.replies');
             // 获取用户列表
             $api->get('member', 'MembersController@index')
                 ->name('api.member.index');

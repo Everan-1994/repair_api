@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Order;
 use App\Models\OrderImages;
+use App\Models\OrderProcess;
 use Illuminate\Http\Request;
 use App\Http\Resources\OrderResource;
 use App\Http\Requests\Api\OrderRequest;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class OrdersController extends Controller
 {
@@ -94,7 +93,30 @@ class OrdersController extends Controller
 
         return response([
             'code' => 0,
-            'msg' => 'Successed'
+            'msg'  => 'Successed'
         ], 200);
+    }
+
+    /**
+     * 申报回复(驳回)
+     */
+    public function replies(Request $request)
+    {
+        $data = $request->all();
+        $data['user_id'] = \Auth::id();
+        dd($data);
+//        \DB::beginTransaction();
+//        try {
+//            $reply = OrderProcess::where($data)->firstOrCreate();
+//            // 更新工单状态(驳回)
+//            Order::whereId($data['order_id'])->update(['status', 1]);
+//            \DB::commit();
+//        } catch (\Exception $exception) {
+//            DB::rollBack();
+//            return response(['error' => '系统出错'], 500);
+//        }
+
+
+        // return response($reply, 200);
     }
 }

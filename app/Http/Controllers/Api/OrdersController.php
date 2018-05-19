@@ -102,21 +102,26 @@ class OrdersController extends Controller
      */
     public function replies(Request $request)
     {
-        $data = $request->all();
-        $data['user_id'] = \Auth::id();
-        dd($data);
-//        \DB::beginTransaction();
-//        try {
-//            $reply = OrderProcess::where($data)->firstOrCreate();
-//            // 更新工单状态(驳回)
-//            Order::whereId($data['order_id'])->update(['status', 1]);
-//            \DB::commit();
-//        } catch (\Exception $exception) {
-//            DB::rollBack();
-//            return response(['error' => '系统出错'], 500);
-//        }
+        \DB::beginTransaction();
+        try {
+            $reply = OrderProcess::updateOrCreate(
+                [
+                    'order_id' => $request->order_id,
+                    'user_id'  => \Auth::id(),
+                    'type'     => $request->type
+                ],
+                [
+                    'content' => $request->content
+                ]
+            );
+            // 更新工单状态(驳回)
+            Order::whereId($request->order_id)->update(['status' => 1]);
+            \DB::commit();
+        } catch (\Exception $exception) {
+            \DB::rollBack();
+            return response(['error' => $exception->getMessage()], 500);
+        }
 
-
-        // return response($reply, 200);
+        return response($reply, 200);
     }
 }

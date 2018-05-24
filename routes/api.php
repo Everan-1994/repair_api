@@ -103,7 +103,12 @@ $api->group([
             // 获取用户列表
             $api->get('member', 'MembersController@index')
                 ->name('api.member.index');
-
+            // 变更身份
+            $api->patch('member', 'MembersController@changeIdentify')
+                ->name('api.member.changeIdentify');
+            // 变更状态
+            $api->patch('member/status', 'MembersController@changeStatus')
+                ->name('api.member.changeStatus');
         });
 
     });

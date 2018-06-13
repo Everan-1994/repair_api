@@ -93,17 +93,18 @@ class OrdersController extends Controller
     {
         \DB::beginTransaction();
         try {
-            $order->save([
-                'area_id'   => $orderRequest->area_id,
-                'type'      => $orderRequest->type,
-                'address'   => $orderRequest->address,
-                'content'   => $orderRequest->contents,
+            $order->whereId($order['id'])->update([
+                'area_id'    => $orderRequest->area_id,
+                'type'       => $orderRequest->type,
+                'address'    => $orderRequest->address,
+                'content'    => $orderRequest->contents,
+                'updated_at' => now()->toDateTimeString()
             ]);
 
             $images = OrderImages::where('order_id', $order['id'])->exists();
 
             // 删除图片
-            if ($images && count($orderRequest->imagesUrl) == 3) {
+            if ($images && (count($orderRequest->imagesUrl) == 3 || empty($orderRequest->imagesUrl))) {
                 OrderImages::where('order_id', $order['id'])->delete();
 
 //                $common = new CommonsController();

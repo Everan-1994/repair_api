@@ -104,25 +104,11 @@ class OrdersController extends Controller
             $images = OrderImages::where('order_id', $order['id'])->get()->pluck('image_url');
 
             // 删除图片
-            if ($images && count($orderRequest->imagesUrl) == 3) {
+            if (($images && count($orderRequest->imagesUrl) == 3) || ($images && empty($orderRequest->oldImages))) {
                 OrderImages::where('order_id', $order['id'])->delete();
 
                 // 云服务器删除图片
                 $this->del_images($images);
-            }
-
-            if ($images && $orderRequest->oldImages) {
-
-                $collection = collect($images);
-
-                $diff = $collection->diff($orderRequest->oldImages);
-
-                if ($diff->all()) {
-                    OrderImages::where('order_id', 'in', $diff->all())->delete();
-
-                    // 云服务器删除图片
-                    $this->del_images($diff->all());
-                }
             }
 
             if (!empty($orderRequest->imagesUrl)) {
@@ -141,8 +127,8 @@ class OrdersController extends Controller
 
             return response([
                 'code' => 0,
-                'msg'  => 'Successed'
-            ], 200);
+                'msg' => 'success'
+            ]);
         } catch (\Exception $exception) {
             \DB::rollBack();
             return response(['error' => $exception->getMessage()], $exception->getCode());

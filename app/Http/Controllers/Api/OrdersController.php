@@ -100,10 +100,10 @@ class OrdersController extends Controller
                 'content'   => $orderRequest->contents,
             ]);
 
-            $images = OrderImages::where('order_id', $order['id'])->get()->pluck('image_url')->toArray();
+            $images = OrderImages::where('order_id', $order['id'])->exists();
 
             // 删除图片
-            if (($images && count($orderRequest->imagesUrl) == 3) || ($images && empty($orderRequest->oldImages))) {
+            if ($images && count($orderRequest->imagesUrl) == 3) {
                 OrderImages::where('order_id', $order['id'])->delete();
 
 //                $common = new CommonsController();

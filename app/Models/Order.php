@@ -47,4 +47,12 @@ class Order extends Model
             ->with('user')
             ->orderBy('id', 'asc');
     }
+
+    /**
+     * 申报类型
+     */
+    public function types()
+    {
+        return $this->belongsTo(Type::class, 'type', 'id');
+    }
 }

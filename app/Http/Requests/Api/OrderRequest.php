@@ -8,13 +8,25 @@ class OrderRequest extends Request
 {
     public function rules()
     {
-        return [
-            'school_id' => 'required',
-            'area_id'   => 'required',
-            'type'      => 'required',
-            'address'   => 'required',
-            'contents'   => 'required'
-        ];
+        switch ($this->method()) {
+            case 'POST':
+                return [
+                    'school_id' => 'required',
+                    'area_id'   => 'required',
+                    'type'      => 'required',
+                    'address'   => 'required',
+                    'contents'  => 'required'
+                ];
+                break;
+            case 'PUT':
+                return [
+                    'area_id'  => 'required',
+                    'type'     => 'required',
+                    'address'  => 'required',
+                    'contents' => 'required'
+                ];
+                break;
+        }
     }
 
     public function messages()
@@ -24,7 +36,7 @@ class OrderRequest extends Request
             'area_id.required'   => '请选择区域',
             'type.required'      => '请选择申报类型',
             'address.required'   => '请填写地址',
-            'contents.required'   => '请填写事项'
+            'contents.required'  => '请填写事项'
         ];
     }
 }

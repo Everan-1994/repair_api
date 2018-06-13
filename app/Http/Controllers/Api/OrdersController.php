@@ -8,6 +8,7 @@ use App\Models\OrderProcess;
 use Illuminate\Http\Request;
 use App\Http\Resources\OrderResource;
 use App\Http\Requests\Api\OrderRequest;
+use Illuminate\Support\Facades\Storage;
 
 class OrdersController extends Controller
 {
@@ -18,7 +19,24 @@ class OrdersController extends Controller
         $order = Order::whereSchoolId($request->school_id)
             ->with(['area', 'images', 'user'])
             ->when(isset($request->status), function ($query) use ($request) {
-                return $query->whereStatus($request->status);
+                if ($request->self == 1) {
+                    switch ($request->status) {
+                        case 1:
+                            // 0 申述中
+                            return $query->whereStatus(4);
+                            break;
+                        case 2:
+                            // 3 已完成 && 5 已评价
+                            return $query->whereStatus(3)->orWhere('status', 5);
+                            break;
+                        default:
+                            // 0 申报中 && 1 驳回 && 2 维修中
+                            return $query->whereBetween('status', [0, 2]);
+                            break;
+                    }
+                } else {
+                    return $query->whereStatus($request->status);
+                }
             })
             ->when($request->self == 1, function ($query) use ($user_id) {
                 return $query->whereUserId($user_id);
@@ -27,7 +45,7 @@ class OrdersController extends Controller
                 return $query->whereType($request->type);
             })
             ->orderBy($request->created_at ?: 'created_at', $request->desc ?: 'desc')
-            ->paginate($request->pageSize ?: 5, ['*'], 'page', $request->page ?: 1);
+            ->paginate($request->pageSize ?: 10, ['*'], 'page', $request->page ?: 1);
 
         return OrderResource::collection($order);
     }
@@ -47,7 +65,7 @@ class OrdersController extends Controller
                 'address'   => $orderRequest->address,
                 'content'   => $orderRequest->contents,
                 'user_id'   => \Auth::id(),
-                'status'    => $orderRequest->status
+                'status'    => $orderRequest->status ?: 0
             ]);
 
             if (!empty($orderRequest->imagesUrl)) {
@@ -62,15 +80,73 @@ class OrdersController extends Controller
                 OrderImages::insert($arr);
             }
 
-
             \DB::commit();
 
             return response($order);
         } catch (\Exception $exception) {
+            \DB::rollBack();
             return response(['error' => $exception->getMessage()], $exception->getCode());
-            DB::rollBack();
         }
 
+    }
+
+    public function update(OrderRequest $orderRequest, Order $order)
+    {
+        \DB::beginTransaction();
+        try {
+            $order->update([
+                'area_id'   => $orderRequest->area_id,
+                'type'      => $orderRequest->type,
+                'address'   => $orderRequest->address,
+                'content'   => $orderRequest->contents,
+            ]);
+
+            $images = OrderImages::where('order_id', $order['id'])->get()->pluck('image_url');
+
+            // 删除图片
+            if ($images && count($orderRequest->imagesUrl) == 3) {
+                OrderImages::where('order_id', $order['id'])->delete();
+
+                // 云服务器删除图片
+                $this->del_images($images);
+            }
+
+            if ($images && $orderRequest->oldImages) {
+
+                $collection = collect($images);
+
+                $diff = $collection->diff($orderRequest->oldImages);
+
+                if ($diff->all()) {
+                    OrderImages::where('order_id', 'in', $diff->all())->delete();
+
+                    // 云服务器删除图片
+                    $this->del_images($diff->all());
+                }
+            }
+
+            if (!empty($orderRequest->imagesUrl)) {
+                foreach ($orderRequest->imagesUrl as $val) {
+                    $arr[] = [
+                        'order_id'   => $order['id'],
+                        'image_url'  => $val,
+                        'created_at' => now()->toDateTimeString(),
+                        'updated_at' => now()->toDateTimeString()
+                    ];
+                }
+                OrderImages::insert($arr);
+            }
+
+            \DB::commit();
+
+            return response([
+                'code' => 0,
+                'msg'  => 'Successed'
+            ], 200);
+        } catch (\Exception $exception) {
+            \DB::rollBack();
+            return response(['error' => $exception->getMessage()], $exception->getCode());
+        }
     }
 
     public function getAllOrder(Request $request, Order $order)
@@ -94,7 +170,7 @@ class OrdersController extends Controller
         return response([
             'code' => 0,
             'msg'  => 'Successed'
-        ], 200);
+        ], 204);
     }
 
     /**
@@ -123,5 +199,17 @@ class OrdersController extends Controller
         }
 
         return response($reply, 200);
+    }
+
+    // 删除 upyun 上的图片
+    // 删除又拍云上的图片
+    public function del_images($paths)
+    {
+        $drive = Storage::disk('upyun');
+
+        foreach ($paths as $k => $path) {
+            $drive->delete($path);
+        }
+
     }
 }

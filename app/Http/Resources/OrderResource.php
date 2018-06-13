@@ -10,7 +10,7 @@ class OrderResource extends Resource
         return [
             'id'             => $this->id,
             'order'          => $this->order,
-            'type'           => $this->type,
+            'type'           => $this->types,
             'school_id'      => $this->school_id,
             'area'           => $this->whenLoaded('area'),
             'address'        => $this->address,

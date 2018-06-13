@@ -57,4 +57,14 @@ class MembersController extends Controller
             'msg'  => '更新成功'
         ]);
     }
+
+    public function delUser(User $user)
+    {
+        $user->delete();
+
+        return response([
+            'code' => 0,
+            'msg'  => '删除成功'
+        ]);
+    }
 }

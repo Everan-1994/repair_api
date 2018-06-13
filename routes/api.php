@@ -88,6 +88,9 @@ $api->group([
             // 提交申报
             $api->post('order', 'OrdersController@store')
                 ->name('api.order.store');
+            // 提交申报(编辑)
+            $api->put('order/{order}', 'OrdersController@update')
+                ->name('api.order.update');
             // 获取申报列表
             $api->get('orders', 'OrdersController@index')
                 ->name('api.order.index');
@@ -109,6 +112,19 @@ $api->group([
             // 变更状态
             $api->patch('member/status', 'MembersController@changeStatus')
                 ->name('api.member.changeStatus');
+
+            // 类型列表
+            $api->get('type', 'TypesController@index')
+                ->name('api.type.index');
+            // 类型详情
+            $api->get('type/{type}', 'TypesController@show')
+                ->name('api.type.show');
+            // 类型列表
+            $api->post('type', 'TypesController@store')
+                ->name('api.type.store');
+            // 类型列表
+            $api->patch('type/{type}', 'TypesController@update')
+                ->name('api.type.update');
         });
 
     });

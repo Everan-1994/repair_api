@@ -16,4 +16,10 @@ class CommonsController extends Controller
             'url'  => $result
         ]);
     }
+
+    // 删除又拍云上的图片
+    public function delImage($path)
+    {
+        return Storage::disk('upyun')->delete('/' . $path);
+    }
 }

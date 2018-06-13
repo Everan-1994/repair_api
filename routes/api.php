@@ -40,6 +40,9 @@ $api->group([
             // 上传图片
             $api->post('upload/image', 'CommonsController@upload')
                 ->name('api.common.upload');
+            // 删除图片
+            $api->delete('del/image', 'CommonsController@delImage')
+                ->name('api.common.delImage');
             // 学校列表
             $api->get('school', 'SchoolsController@index')
                 ->name('api.school.index');

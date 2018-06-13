@@ -8,7 +8,6 @@ use App\Models\OrderProcess;
 use Illuminate\Http\Request;
 use App\Http\Resources\OrderResource;
 use App\Http\Requests\Api\OrderRequest;
-use Illuminate\Support\Facades\Storage;
 
 class OrdersController extends Controller
 {
@@ -94,21 +93,24 @@ class OrdersController extends Controller
     {
         \DB::beginTransaction();
         try {
-            $order->update([
+            $order->save([
                 'area_id'   => $orderRequest->area_id,
                 'type'      => $orderRequest->type,
                 'address'   => $orderRequest->address,
                 'content'   => $orderRequest->contents,
             ]);
 
-            $images = OrderImages::where('order_id', $order['id'])->get()->pluck('image_url');
+            $images = OrderImages::where('order_id', $order['id'])->get()->pluck('image_url')->toArray();
 
             // 删除图片
             if (($images && count($orderRequest->imagesUrl) == 3) || ($images && empty($orderRequest->oldImages))) {
                 OrderImages::where('order_id', $order['id'])->delete();
 
-                // 云服务器删除图片
-                $this->del_images($images);
+//                $common = new CommonsController();
+//                // 云服务器删除图片
+//                foreach ($images as $image) {
+//                    $common->delImage($image);
+//                }
             }
 
             if (!empty($orderRequest->imagesUrl)) {
@@ -185,17 +187,5 @@ class OrdersController extends Controller
         }
 
         return response($reply, 200);
-    }
-
-    // 删除 upyun 上的图片
-    // 删除又拍云上的图片
-    public function del_images($paths)
-    {
-        $drive = Storage::disk('upyun');
-
-        foreach ($paths as $k => $path) {
-            $drive->delete($path);
-        }
-
     }
 }

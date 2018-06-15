@@ -38,7 +38,7 @@ class Order extends Model
     public function repair()
     {
         return $this->belongsTo(User::class, 'repair_id', 'id')
-            ->select('id', 'name', 'sex', 'avatar');
+            ->select('id', 'name', 'truename', 'sex', 'avatar');
     }
 
     public function processes()

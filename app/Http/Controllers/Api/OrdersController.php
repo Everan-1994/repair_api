@@ -16,7 +16,7 @@ class OrdersController extends Controller
         $user_id = \Auth::id();
 
         $order = Order::whereSchoolId($request->school_id)
-            ->with(['area', 'images', 'user'])
+            ->with(['area', 'images', 'user', 'repair'])
             ->when(isset($request->status), function ($query) use ($request) {
                 if ($request->self == 1) {
                     switch ($request->status) {
@@ -130,7 +130,7 @@ class OrdersController extends Controller
 
             return response([
                 'code' => 0,
-                'msg' => 'success'
+                'msg'  => 'success'
             ]);
         } catch (\Exception $exception) {
             \DB::rollBack();
@@ -188,5 +188,99 @@ class OrdersController extends Controller
         }
 
         return response($reply, 200);
+    }
+
+    /**
+     * 维修员维修的工单
+     */
+    public function getOrderList(Request $request)
+    {
+        $user_id = \Auth::id();
+
+        $order = Order::whereSchoolId($request->school_id)
+            ->with(['area', 'images', 'user'])
+            ->when(isset($request->status), function ($query) use ($request) {
+                switch ($request->status) {
+                    case 1:
+                        // 3 已完成
+                        return $query->whereStatus(3);
+                        break;
+                    case 2:
+                        // 5 已评价
+                        return $query->whereStatus(5);
+                        break;
+                    default:
+                        // 0 申报中 && 2 维修中
+                        return $query->whereStatus(2);
+                        break;
+                }
+            })
+            ->when($request->self == 1, function ($query) use ($user_id) {
+                return $query->whereRepairId($user_id);
+            })
+            ->orderBy($request->created_at ?: 'created_at', $request->desc ?: 'desc')
+            ->paginate($request->pageSize ?: 10, ['*'], 'page', $request->page ?: 1);
+
+        return OrderResource::collection($order);
+    }
+
+    public function dispatchs(Request $request, Order $order, OrderProcess $orderProcess)
+    {
+        \DB::beginTransaction();
+        try {
+            // 新增进度
+            $orderProcess->create([
+                'type'     => 2,
+                'user_id'  => $request->repair_id, // 维修中
+                'order_id' => $request->order_id,
+                'content'  => '工单已受理。'
+            ]);
+
+            // 更新工单
+            $order->whereId($request->order_id)->update([
+                'status'     => 2,
+                'repair_id'  => $request->repair_id,
+                'updated_at' => now()->toDateTimeString()
+            ]);
+            \DB::commit();
+
+            return response([
+                'code' => 0,
+                'msg'  => 'success'
+            ], 201);
+        } catch (\Exception $exception) {
+            \DB::rollBack();
+            return response(['error' => $exception->getMessage()], 500);
+        }
+
+    }
+
+    public function fixedOrder(Request $request, Order $order, OrderProcess $orderProcess)
+    {
+        \DB::beginTransaction();
+        try {
+            // 新增进度
+            $orderProcess->create([
+                'type'     => 3,
+                'user_id'  => \Auth::id(), // 维修员id
+                'order_id' => $request->order_id,
+                'content'  => $request->content ?: '工单已完成。',
+            ]);
+
+            // 更新工单
+            $order->whereId($request->order_id)->update([
+                'status'     => 3,
+                'updated_at' => now()->toDateTimeString()
+            ]);
+            \DB::commit();
+
+            return response([
+                'code' => 0,
+                'msg'  => 'success'
+            ], 201);
+        } catch (\Exception $exception) {
+            \DB::rollBack();
+            return response(['error' => $exception->getMessage()], 500);
+        }
     }
 }

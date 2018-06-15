@@ -15,9 +15,12 @@ class MembersController extends Controller
             ->when(isset($request->status), function ($query) use ($request) {
                 return $query->whereStatus($request->status);
             })
+            ->when(isset($request->truename), function ($query) use ($request) {
+                return $query->where('truename', 'like', '%' . $request->truename . '%');
+            })
             ->whereIdentify($request->identify)
             ->orderBy($request->order ?: 'created_at', $request->sort ?: 'desc')
-            ->paginate($request->pageSize, ['*'], 'page', $request->page ?: 1);
+            ->paginate($request->pageSize ?: 10, ['*'], 'page', $request->page ?: 1);
 
         return UserResource::collection($user);
     }
@@ -27,10 +30,10 @@ class MembersController extends Controller
      */
     public function changeIdentify(Request $request)
     {
-        if (!isset($request->type)) {
-            $hasOrder = Order::whereUserId($request->user_id)->first(); // 存在申报
+        if ($request->type == 1) {
+            $hasOrder = Order::whereUserId($request->user_id)->exists(); // 存在申报
         } else {
-            $hasOrder = Order::whereRepairId($request->user_id)->first(); // 存在接单
+            $hasOrder = Order::whereRepairId($request->user_id)->exists(); // 存在接单
         }
 
         if ($hasOrder) {

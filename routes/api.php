@@ -97,6 +97,9 @@ $api->group([
             // 获取申报列表
             $api->get('orders', 'OrdersController@index')
                 ->name('api.order.index');
+            // 获取申报列表
+            $api->get('orders/repair', 'OrdersController@getOrderList')
+                ->name('api.order.getOrderList');
             // 获取申报详情
             $api->get('orders/{order}', 'OrdersController@show')
                 ->name('api.order.show');
@@ -128,6 +131,13 @@ $api->group([
             // 类型列表
             $api->patch('type/{type}', 'TypesController@update')
                 ->name('api.type.update');
+
+            // 派工
+            $api->post('dispatch', 'OrdersController@dispatchs')
+                ->name('api.order.dispatchs');
+            // 完工
+            $api->post('orders/fixedOrder', 'OrdersController@fixedOrder')
+                ->name('api.order.fixedOrder');
         });
 
     });

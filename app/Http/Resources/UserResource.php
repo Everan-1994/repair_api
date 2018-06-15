@@ -16,6 +16,8 @@ class UserResource extends Resource
         return [
             'id'        => $this->id,
             'name'      => $this->name,
+            'truename'  => $this->when(!is_null($this->truename), $this->truename),
+            'sex'       => $this->sex,
             'email'     => $this->email,
             'school'    => new SchoolResource($this->whenLoaded('school')),
             'school_id' => $this->school_id,

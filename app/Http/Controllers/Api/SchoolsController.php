@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\School;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\SchoolResource;
 use App\Http\Resources\SchoolCollection;
@@ -33,6 +34,12 @@ class SchoolsController extends Controller
     {
         $school->fill($request->all());
         $school->save();
+
+        // 更新头像
+        User::where(['identify' => 2, 'school_id' => $school['id']])->update([
+            'avatar' => $school->logo,
+            'updated_at' => now()->toDateTimeString()
+        ]);
 
         return response([
            'code' => 0,

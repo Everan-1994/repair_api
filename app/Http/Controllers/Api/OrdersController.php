@@ -290,7 +290,7 @@ class OrdersController extends Controller
         \DB::beginTransaction();
         try {
             // 新增进度
-            $op = $orderProcess->create([
+            $orderProcess->create([
                 'type'     => 5,
                 'user_id'  => \Auth::id(), // 用户id
                 'order_id' => $request->order_id,
@@ -306,7 +306,7 @@ class OrdersController extends Controller
             // 评价
             $evaluate->create([
                 'order_id'   => $request->order_id,
-                'ps_id'      => $op['id'],
+                'ps_id'      => $orderProcess['id'],
                 'content'    => $request->content,
                 'evaluate'   => $request->evaluate,
                 'service'    => $request->sstar,

@@ -15,4 +15,12 @@ class OrderProcess extends Model
         return $this->belongsTo(User::class, 'user_id', 'id')
             ->select('id', 'name', 'avatar', 'truename', 'phone');
     }
+
+    /**
+     * 评价
+     */
+    public function evaluate()
+    {
+        return $this->hasOne(Evaluate::class, 'ps_id', 'id');
+    }
 }

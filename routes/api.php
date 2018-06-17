@@ -138,6 +138,9 @@ $api->group([
             // 完工
             $api->post('orders/fixedOrder', 'OrdersController@fixedOrder')
                 ->name('api.order.fixedOrder');
+            // 评价
+            $api->post('orders/evaluateOrder', 'OrdersController@evaluateOrder')
+                ->name('api.order.evaluateOrder');
         });
 
     });

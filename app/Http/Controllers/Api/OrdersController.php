@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Evaluate;
 use App\Models\Order;
 use App\Models\OrderImages;
 use App\Models\OrderProcess;
@@ -21,12 +22,12 @@ class OrdersController extends Controller
                 if ($request->self == 1) {
                     switch ($request->status) {
                         case 1:
-                            // 0 申述中
-                            return $query->whereStatus(4);
-                            break;
-                        case 2:
                             // 3 已完成 && 5 已评价
                             return $query->whereStatus(3)->orWhere('status', 5);
+                            break;
+                        case 2:
+                            // 4 申述中
+                            return $query->whereStatus(4);
                             break;
                         default:
                             // 0 申报中 && 1 驳回 && 2 维修中
@@ -148,7 +149,7 @@ class OrdersController extends Controller
 
     public function show(Order $order)
     {
-        return new OrderResource($order->whereId($order['id'])->with(['user', 'repair', 'images', 'area', 'processes'])->first());
+        return new OrderResource($order->whereId($order['id'])->with(['user', 'repair', 'images', 'area', 'processes', 'evaluate'])->first());
     }
 
     public function del(Order $order)
@@ -272,6 +273,46 @@ class OrdersController extends Controller
                 'status'     => 3,
                 'updated_at' => now()->toDateTimeString()
             ]);
+            \DB::commit();
+
+            return response([
+                'code' => 0,
+                'msg'  => 'success'
+            ], 201);
+        } catch (\Exception $exception) {
+            \DB::rollBack();
+            return response(['error' => $exception->getMessage()], 500);
+        }
+    }
+
+    public function evaluateOrder(Request $request, Order $order, OrderProcess $orderProcess, Evaluate $evaluate)
+    {
+        \DB::beginTransaction();
+        try {
+            // 新增进度
+            $op = $orderProcess->create([
+                'type'     => 5,
+                'user_id'  => \Auth::id(), // 用户id
+                'order_id' => $request->order_id,
+                'content'  => $request->content,
+            ]);
+
+            // 更新工单
+            $order->whereId($request->order_id)->update([
+                'status'     => 5,
+                'updated_at' => now()->toDateTimeString()
+            ]);
+
+            // 评价
+            $evaluate->create([
+                'order_id'   => $request->order_id,
+                'ps_id'      => $op['id'],
+                'content'    => $request->content,
+                'evaluate'   => $request->evaluate,
+                'service'    => $request->sstar,
+                'efficiency' => $request->estar
+            ]);
+
             \DB::commit();
 
             return response([

@@ -44,7 +44,7 @@ class Order extends Model
     public function processes()
     {
         return $this->hasMany(OrderProcess::class, 'order_id', 'id')
-            ->with('user')
+            ->with('user', 'evaluate')
             ->orderBy('id', 'asc');
     }
 
@@ -54,5 +54,13 @@ class Order extends Model
     public function types()
     {
         return $this->belongsTo(Type::class, 'type', 'id');
+    }
+
+    /**
+     * 评价
+     */
+    public function evaluate()
+    {
+        return $this->hasOne(Evaluate::class, 'order_id', 'id');
     }
 }

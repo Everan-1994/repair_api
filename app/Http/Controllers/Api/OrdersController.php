@@ -298,7 +298,6 @@ class OrdersController extends Controller
                 'repair_id'  => $request->repair_id,
                 'updated_at' => now()->toDateTimeString()
             ]);
-            \DB::commit();
 
             $od = $order->whereId($request->order_id)->first();
 
@@ -314,6 +313,8 @@ class OrdersController extends Controller
 
             // 模板消息提醒
             $message->newOrderMessage($od);
+
+            \DB::commit();
 
             return response([
                 'code' => 0,

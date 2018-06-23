@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Order;
 use EasyWeChat\Factory;
 
 class MessageController extends Controller
 {
     protected $app;
-    protected $order;
-    public function __construct(Order $order)
-    {
-        $this->order = $order;
 
+    public function __construct()
+    {
         $this->app = Factory::miniProgram([
             'app_id'        => env('WECHAT_MINI_PROGRAM_APPID'),
             'secret'        => env('WECHAT_MINI_PROGRAM_SECRET'),
@@ -25,19 +22,19 @@ class MessageController extends Controller
     /**
      * 新工单提醒
      */
-    public function newOrderMessage()
+    public function newOrderMessage($order)
     {
         return $this->app->template_message->send([
-            'touser'      => $this->order->repair->openid,
+            'touser'      => $order->repair->openid,
             'template_id' => 's1dJ2Tirds-kqLD4PGmfzHBEzJASinF8Gsn6bbgyZCU',
-            'page'        => 'pages/show?id=' . $this->order->id,
-            'form_id'     => $this->order->form_id,
+            'page'        => 'pages/show?id=' . $order->id,
+            'form_id'     => $order->form_id,
             'data'        => [
-                'keyword1' => $this->order->order,
+                'keyword1' => $order->order,
                 'keyword2' => '新工单',
-                'keyword3' => $this->order->user->name,
-                'keyword4' => $this->order->content,
-                'keyword5' => $this->order->created_at->toDateTimeString()
+                'keyword3' => $order->user->name,
+                'keyword4' => $order->content,
+                'keyword5' => $order->created_at->toDateTimeString()
             ],
         ]);
     }

@@ -30,7 +30,7 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id')
-            ->select('id', 'name', 'sex', 'avatar', 'address');
+            ->select('id', 'name', 'sex', 'avatar', 'address', 'openid');
     }
 
     /**
@@ -39,7 +39,7 @@ class Order extends Model
     public function repair()
     {
         return $this->belongsTo(User::class, 'repair_id', 'id')
-            ->select('id', 'name', 'truename', 'sex', 'avatar');
+            ->select('id', 'name', 'truename', 'sex', 'avatar', 'openid');
     }
 
     public function processes()

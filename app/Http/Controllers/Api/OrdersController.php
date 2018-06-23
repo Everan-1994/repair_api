@@ -291,7 +291,6 @@ class OrdersController extends Controller
                 );
             }
 
-
             // 更新工单
             $order->whereId($request->order_id)->update([
                 'status'     => 2,

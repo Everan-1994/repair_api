@@ -11,8 +11,8 @@ class MessageController extends Controller
     public function __construct()
     {
         $this->app = Factory::miniProgram([
-            'app_id' => env('WECHAT_MINI_PROGRAM_APPID'),
-            'secret' => env('WECHAT_MINI_PROGRAM_SECRET'),
+            'app_id'        => env('WECHAT_MINI_PROGRAM_APPID'),
+            'secret'        => env('WECHAT_MINI_PROGRAM_SECRET'),
 
             // 指定 API 调用返回结果的类型：array(default)/collection/object/raw/自定义类名
             'response_type' => 'array'
@@ -24,17 +24,17 @@ class MessageController extends Controller
      */
     public function newOrderMessage($order)
     {
-        $this->app->template_message->send([
-            'touser' => $order->repair->openid,
+        return $this->app->template_message->send([
+            'touser'      => $order->repair->openid,
             'template_id' => 's1dJ2Tirds-kqLD4PGmfzHBEzJASinF8Gsn6bbgyZCU',
-            'page' => 'pages/show?id=' . $order->id,
-            'form_id' => $order->form_id,
-            'data' => [
+            'page'        => 'pages/show?id=' . $order->id,
+            'form_id'     => $order->form_id,
+            'data'        => [
                 'keyword1' => $order->order,
                 'keyword2' => '新工单',
                 'keyword3' => $order->user->name,
                 'keyword4' => $order->content,
-                'keyword5' => '2018'
+                'keyword5' => $order->created_at->toDateTimeString()
             ],
         ]);
     }

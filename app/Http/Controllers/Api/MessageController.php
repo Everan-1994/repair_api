@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Order;
 use EasyWeChat\Factory;
 
 class MessageController extends Controller
@@ -22,8 +23,10 @@ class MessageController extends Controller
     /**
      * 新工单提醒
      */
-    public function newOrderMessage($order)
+    public function newOrderMessage($id)
     {
+        $order = Order::whereId($id)->first();
+        
         return $this->app->template_message->send([
             'touser'      => $order->repair->openid,
             'template_id' => 's1dJ2Tirds-kqLD4PGmfzHBEzJASinF8Gsn6bbgyZCU',

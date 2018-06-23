@@ -34,9 +34,7 @@ class NewOrderMessage implements ShouldQueue
      */
     public function handle()
     {
-        $order = \DB::table('orders')->whereId($this->order->id)->first();
-
         $message = new MessageController();
-        $message->newOrderMessage($order);
+        $message->newOrderMessage($this->order->id);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Http\Controllers\Api\MessageController;
+use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -22,10 +23,10 @@ class NewOrderMessage implements ShouldQueue
      */
     public $tries = 3;
 
-    public function __construct(MessageController $message, $order)
+    public function __construct(MessageController $message, Order $order)
     {
         $this->message = $message;
-        $this->order = $order;
+        $this->order = $order; // 只序列化id
     }
 
     /**
@@ -35,6 +36,8 @@ class NewOrderMessage implements ShouldQueue
      */
     public function handle()
     {
-        $this->message->newOrderMessage($this->order);
+        $order = \DB::table('orders')->whereId($this->order->id)->first();
+
+        $this->message->newOrderMessage($order);
     }
 }

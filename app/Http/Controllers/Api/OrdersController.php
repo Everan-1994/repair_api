@@ -68,7 +68,7 @@ class OrdersController extends Controller
                 'address'   => $orderRequest->address,
                 'content'   => $orderRequest->contents,
                 'user_id'   => \Auth::id(),
-                'status'    => $orderRequest->status ?: 0,
+                'status'    => 0,
                 'form_id'   => $orderRequest->form_id
             ]);
 

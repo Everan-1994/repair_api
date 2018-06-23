@@ -44,7 +44,7 @@ class Order extends Model
     public function processes()
     {
         return $this->hasMany(OrderProcess::class, 'order_id', 'id')
-            ->with('user', 'evaluate')
+            ->with('user', 'evaluate', 'images')
             ->orderBy('id', 'asc');
     }
 

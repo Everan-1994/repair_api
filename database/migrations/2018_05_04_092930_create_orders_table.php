@@ -26,6 +26,7 @@ class CreateOrdersTable extends Migration
             $table->tinyInteger('assess')->default(0)->comment('评价：0-未评价、1-好评、2-中评、3-差评');
             $table->string('assess_content')->nullable()->comment('评价内容');
             $table->tinyInteger('status')->default(0)->comment('工单状态：0-驳回、1-审核、2-派工、3-完工、4-申诉(调回第一步)');
+            $table->string('form_id')->unique()->comment('发送模板消息的form_id');
             $table->timestamps();
         });
     }

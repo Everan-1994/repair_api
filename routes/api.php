@@ -31,7 +31,7 @@ $api->group([
     });
 
     $api->group([
-        'middleware' => 'throttle: 120, 1', // 调用接口限制 1分钟60次
+        'middleware' => 'throttle: 120, 1', // 调用接口限制 1分钟120次
     ], function ($api) {
         // 游客可以访问的api
 
@@ -141,6 +141,16 @@ $api->group([
             // 评价
             $api->post('orders/evaluateOrder', 'OrdersController@evaluateOrder')
                 ->name('api.order.evaluateOrder');
+            // 申诉
+            $api->post('orders/statementOrder', 'OrdersController@statementOrder')
+                ->name('api.order.statementOrder');
+
+            // 通知列表
+            $api->get('user/notifications', 'NotificationsController@index')
+                ->name('api.user.notifications.index');
+            // 通知统计
+            $api->get('user/notifications/stats', 'NotificationsController@stats')
+                ->name('api.user.notifications.stats');
         });
 
     });

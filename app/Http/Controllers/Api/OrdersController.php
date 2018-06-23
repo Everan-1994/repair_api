@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Evaluate;
 use App\Models\Order;
+use App\Models\Evaluate;
+use App\Models\Statement;
 use App\Models\OrderImages;
 use App\Models\OrderProcess;
+use App\Models\User;
+use App\Notifications\OrderNotify;
 use Illuminate\Http\Request;
 use App\Http\Resources\OrderResource;
 use App\Http\Requests\Api\OrderRequest;
@@ -65,7 +68,8 @@ class OrdersController extends Controller
                 'address'   => $orderRequest->address,
                 'content'   => $orderRequest->contents,
                 'user_id'   => \Auth::id(),
-                'status'    => $orderRequest->status ?: 0
+                'status'    => $orderRequest->status ?: 0,
+                'form_id'   => $orderRequest->form_id
             ]);
 
             if (!empty($orderRequest->imagesUrl)) {
@@ -80,6 +84,11 @@ class OrdersController extends Controller
                 OrderImages::insert($arr);
             }
 
+            // 通知管理员有新工单
+            $order->types = 1;
+            $user = User::where(['school_id' => $order['school_id'], 'identify' => 2])->first();
+            $user->notify(new OrderNotify($order));
+
             \DB::commit();
 
             return response($order);
@@ -90,7 +99,7 @@ class OrdersController extends Controller
 
     }
 
-    public function update(OrderRequest $orderRequest, Order $order)
+    public function update(OrderRequest $orderRequest, Order $order, OrderProcess $orderProcess)
     {
         \DB::beginTransaction();
         try {
@@ -99,8 +108,19 @@ class OrdersController extends Controller
                 'type'       => $orderRequest->type,
                 'address'    => $orderRequest->address,
                 'content'    => $orderRequest->contents,
+                'status'     => 0,
                 'updated_at' => now()->toDateTimeString()
             ]);
+
+            if ($order['status'] == 1) {
+                // 新增进度
+                $orderProcess->create([
+                    'type'     => 0,
+                    'user_id'  => $order['user_id'], // 申报人
+                    'order_id' => $order['id'],
+                    'content'  => $orderRequest->contents
+                ]);
+            }
 
             $images = OrderImages::where('order_id', $order['id'])->exists();
 
@@ -170,18 +190,32 @@ class OrdersController extends Controller
     {
         \DB::beginTransaction();
         try {
-            $reply = OrderProcess::updateOrCreate(
-                [
-                    'order_id' => $request->order_id,
-                    'user_id'  => \Auth::id(),
-                    'type'     => $request->type
-                ],
-                [
-                    'content' => $request->content
-                ]
-            );
-            // 更新工单状态(驳回)
-            Order::whereId($request->order_id)->update(['status' => 1]);
+            if ($request->order_status == 3) {
+                $reply = OrderProcess::create(
+                    [
+                        'order_id' => $request->order_id,
+                        'user_id'  => \Auth::id(),
+                        'type'     => $request->type,
+                        'content'  => $request->content
+                    ]
+                );
+                // 更新工单状态(已完成)
+                Order::whereId($request->order_id)->update(['status' => 3]);
+            } else {
+                $reply = OrderProcess::updateOrCreate(
+                    [
+                        'order_id' => $request->order_id,
+                        'user_id'  => \Auth::id(),
+                        'type'     => $request->type
+                    ],
+                    [
+                        'content' => $request->content
+                    ]
+                );
+                // 更新工单状态(驳回)
+                Order::whereId($request->order_id)->update(['status' => 1]);
+            }
+
             \DB::commit();
         } catch (\Exception $exception) {
             \DB::rollBack();
@@ -225,17 +259,34 @@ class OrdersController extends Controller
         return OrderResource::collection($order);
     }
 
-    public function dispatchs(Request $request, Order $order, OrderProcess $orderProcess)
+    public function dispatchs(Request $request, Order $order, OrderProcess $orderProcess, MessageController $message)
     {
         \DB::beginTransaction();
         try {
-            // 新增进度
-            $orderProcess->create([
-                'type'     => 2,
-                'user_id'  => $request->repair_id, // 维修中
-                'order_id' => $request->order_id,
-                'content'  => '工单已受理。'
-            ]);
+            if ($request->order_status == 2) {
+                // 新增进度
+                $orderProcess->create(
+                    [
+                        'type'     => 2,
+                        'order_id' => $request->order_id,
+                        'content'  => '工单已受理。',
+                        'user_id'  => $request->repair_id, // 维修员id
+                    ]
+                );
+            } else {
+                // 新增进度 & 更新
+                $orderProcess->updateOrCreate(
+                    [
+                        'type'     => 2,
+                        'order_id' => $request->order_id,
+                        'content'  => '工单已受理。'
+                    ],
+                    [
+                        'user_id' => $request->repair_id, // 维修员id
+                    ]
+                );
+            }
+
 
             // 更新工单
             $order->whereId($request->order_id)->update([
@@ -245,10 +296,26 @@ class OrdersController extends Controller
             ]);
             \DB::commit();
 
+            $od = $order->whereId($request->order_id)->with('images')->first();
+
+            if ($od->status == 0) {
+                // 通知用户工单已派工
+                $od->types = 2;
+                $od->user->notify(new OrderNotify($od));
+            }
+
+            // 通知维修员有新工单
+            $od->types = 1;
+            $od->repair->notify(new OrderNotify($od));
+
+            // 模板消息提醒
+            $message->newOrderMessage($od);
+
             return response([
                 'code' => 0,
                 'msg'  => 'success'
             ], 201);
+
         } catch (\Exception $exception) {
             \DB::rollBack();
             return response(['error' => $exception->getMessage()], 500);
@@ -312,6 +379,49 @@ class OrdersController extends Controller
                 'service'    => $request->sstar,
                 'efficiency' => $request->estar
             ]);
+
+            \DB::commit();
+
+            return response([
+                'code' => 0,
+                'msg'  => 'success'
+            ], 201);
+        } catch (\Exception $exception) {
+            \DB::rollBack();
+            return response(['error' => $exception->getMessage()], 500);
+        }
+    }
+
+    public function statementOrder(Request $request, Order $order, OrderProcess $orderProcess, Statement $statement)
+    {
+        \DB::beginTransaction();
+        try {
+            // 新增进度
+            $op = $orderProcess->create([
+                'type'     => 4,
+                'user_id'  => \Auth::id(), // 用户id
+                'order_id' => $request->order_id,
+                'content'  => $request->content,
+            ]);
+
+            // 更新工单
+            $order->whereId($request->order_id)->update([
+                'status'     => 4,
+                'updated_at' => now()->toDateTimeString()
+            ]);
+
+            // 申述图片
+            if (!empty($request->imagesUrl)) {
+                foreach ($request->imagesUrl as $val) {
+                    $arr[] = [
+                        'ps_id'      => $op['id'],
+                        'image_url'  => $val,
+                        'created_at' => now()->toDateTimeString(),
+                        'updated_at' => now()->toDateTimeString()
+                    ];
+                }
+                $statement->insert($arr);
+            }
 
             \DB::commit();
 

@@ -9,7 +9,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable;
+    use Notifiable {
+        notify as protected laravelNotify;
+    }
     use HasRoles;
     /**
      * The attributes that are mass assignable.
@@ -19,9 +21,8 @@ class User extends Authenticatable implements JWTSubject
     protected $fillable = [
         'name', 'email', 'password',
         'school_id', 'avatar', 'status',
-        'phone', 'identify', 'notice_count',
-        'address', 'openid', 'weixin_session_key',
-        'is_repair'
+        'phone', 'identify', 'address',
+        'openid', 'weixin_session_key'
     ];
 
     /**
@@ -51,5 +52,11 @@ class User extends Authenticatable implements JWTSubject
     public function school()
     {
         return $this->belongsTo('App\Models\School', 'school_id', 'id');
+    }
+
+    public function notify($instance)
+    {
+        $this->increment('notification_count'); // 未读消息 + 1
+        $this->laravelNotify($instance);
     }
 }

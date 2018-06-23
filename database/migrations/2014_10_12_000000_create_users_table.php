@@ -23,7 +23,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->tinyInteger('identify')->default(5);
             $table->integer('school_id')->default(0)->comment('学校id');
-            $table->string('notice_count')->default(0)->comment('消息数');
+            $table->integer('notification_count')->unsigned()->default(0)->comment('消息数');
             $table->tinyInteger('status')->default(1)->comment('状态');
             $table->string('openid')->unique()->nullable();
             $table->string('weixin_session_key')->nullable();

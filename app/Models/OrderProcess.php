@@ -23,4 +23,12 @@ class OrderProcess extends Model
     {
         return $this->hasOne(Evaluate::class, 'ps_id', 'id');
     }
+
+    /**
+     * 申诉图片
+     */
+    public function images()
+    {
+        return $this->hasMany(Statement::class, 'ps_id', 'id');
+    }
 }

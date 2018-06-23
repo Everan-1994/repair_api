@@ -311,13 +311,13 @@ class OrdersController extends Controller
             $od->repair->notify(new OrderNotify($od));
 
             // 模板消息提醒
-            $message->newOrderMessage($od);
+            $msg = $message->newOrderMessage($od);
 
             \DB::commit();
 
             return response([
                 'code' => 0,
-                'msg'  => 'success'
+                'msg'  => $msg
             ], 201);
 
         } catch (\Exception $exception) {

@@ -14,7 +14,6 @@ class NewOrderMessage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $message;
     protected $order;
     /**
      * 任务可以尝试的最大次数。
@@ -23,9 +22,8 @@ class NewOrderMessage implements ShouldQueue
      */
     public $tries = 3;
 
-    public function __construct(MessageController $message, Order $order)
+    public function __construct(Order $order)
     {
-        $this->message = $message;
         $this->order = $order; // 只序列化id
     }
 
@@ -38,6 +36,7 @@ class NewOrderMessage implements ShouldQueue
     {
         $order = \DB::table('orders')->whereId($this->order->id)->first();
 
-        $this->message->newOrderMessage($order);
+        $message = new MessageController();
+        $message->newOrderMessage($order);
     }
 }

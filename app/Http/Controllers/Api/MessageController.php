@@ -34,7 +34,7 @@ class MessageController extends Controller
                 'keyword2' => '新工单',
                 'keyword3' => $order->user->name,
                 'keyword4' => $order->content,
-                'keyword5' => $order->created_at->toDateTimeString()
+                'keyword5' => '2018'
             ],
         ]);
     }

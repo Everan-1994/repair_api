@@ -85,9 +85,9 @@ class OrdersController extends Controller
             }
 
             // 通知管理员有新工单
-            $od->types = 1;
-            $user = User::where(['school_id' => $od['school_id'], 'identify' => 2])->first();
-            $user->notify(new OrderNotify($od));
+            // $od->types = 1;
+            // $user = User::where(['school_id' => $od['school_id'], 'identify' => 2])->first();
+            // $user->notify(new OrderNotify($od));
 
             \DB::commit();
 

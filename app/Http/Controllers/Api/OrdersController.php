@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Jobs\NewOrderMessage;
 use App\Models\Order;
 use App\Models\Evaluate;
 use App\Models\Statement;
@@ -310,8 +311,8 @@ class OrdersController extends Controller
             $od->types = 1;
             $od->repair->notify(new OrderNotify($od));
 
-            // 模板消息提醒
-            $msg = $message->newOrderMessage($od);
+            // 模板消息提醒(队列)
+            $msg = dispatch(new NewOrderMessage($od));
 
             \DB::commit();
 

@@ -17,14 +17,14 @@ class NotificationResource extends JsonResource
         $data = $this->data;
 
         return [
-            'type'          => $data['type'],
-            'order_id'      => $data['order_id'],
-            'order'         => $data['order'],
-            'content'       => $data['content'],
-            'name'   => $data['name'],
-            'avatar' => $data['avatar'],
-            'status'        => $data['status'],
-            'created_at'    => $this->created_at->toDateTimeString()
+            'type'       => $data['type'],
+            'order_id'   => $data['order_id'],
+            'order'      => $data['order'],
+            'content'    => $data['content'],
+            'name'       => $data['name'],
+            'avatar'     => $data['avatar'],
+            'status'     => $data['status'],
+            'created_at' => $this->created_at->toDateTimeString()
         ];
 
     }

@@ -60,7 +60,7 @@ class OrdersController extends Controller
 
         \DB::beginTransaction();
         try {
-            $order = $order->create([
+            $od = $order->create([
                 'order'     => $order_sn,
                 'school_id' => $orderRequest->school_id,
                 'area_id'   => $orderRequest->area_id,
@@ -75,7 +75,7 @@ class OrdersController extends Controller
             if (!empty($orderRequest->imagesUrl)) {
                 foreach ($orderRequest->imagesUrl as $val) {
                     $arr[] = [
-                        'order_id'   => $order['id'],
+                        'order_id'   => $od['id'],
                         'image_url'  => $val,
                         'created_at' => now()->toDateTimeString(),
                         'updated_at' => now()->toDateTimeString()
@@ -85,13 +85,16 @@ class OrdersController extends Controller
             }
 
             // 通知管理员有新工单
-            $order->types = 1;
-            $user = User::where(['school_id' => $order['school_id'], 'identify' => 2])->first();
-            $user->notify(new OrderNotify($order));
+            $od->types = 1;
+            $user = User::where(['school_id' => $od['school_id'], 'identify' => 2])->first();
+            $user->notify(new OrderNotify($od));
 
             \DB::commit();
 
-            return response($order);
+            return response([
+                'code' => 0,
+                'msg' => 'success'
+            ]);
         } catch (\Exception $exception) {
             \DB::rollBack();
             return response(['error' => $exception->getMessage()], $exception->getCode());
@@ -296,7 +299,7 @@ class OrdersController extends Controller
             ]);
             \DB::commit();
 
-            $od = $order->whereId($request->order_id)->with('images')->first();
+            $od = $order->whereId($request->order_id)->first();
 
             if ($od->status == 0) {
                 // 通知用户工单已派工

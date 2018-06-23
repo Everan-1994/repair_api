@@ -60,7 +60,7 @@ class OrdersController extends Controller
 
         \DB::beginTransaction();
         try {
-            $od = $order->create([
+            $order = $order->create([
                 'order'     => $order_sn,
                 'school_id' => $orderRequest->school_id,
                 'area_id'   => $orderRequest->area_id,
@@ -75,7 +75,7 @@ class OrdersController extends Controller
             if (!empty($orderRequest->imagesUrl)) {
                 foreach ($orderRequest->imagesUrl as $val) {
                     $arr[] = [
-                        'order_id'   => $od['id'],
+                        'order_id'   => $order['id'],
                         'image_url'  => $val,
                         'created_at' => now()->toDateTimeString(),
                         'updated_at' => now()->toDateTimeString()
@@ -85,9 +85,10 @@ class OrdersController extends Controller
             }
 
             // 通知管理员有新工单
-            // $od->types = 1;
-            // $user = User::where(['school_id' => $od['school_id'], 'identify' => 2])->first();
-            // $user->notify(new OrderNotify($od));
+            $od = $order->whereId($order['id'])->first();
+            $od->types = 1;
+            $user = User::where(['school_id' => $order['school_id'], 'identify' => 2])->first();
+            $user->notify(new OrderNotify($od));
 
             \DB::commit();
 

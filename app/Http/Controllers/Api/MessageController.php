@@ -28,7 +28,7 @@ class MessageController extends Controller
         $order = Order::whereId($id)->first();
 
         return $this->app->template_message->send([
-            'touser'      => $order->repair->openid,
+            'touser'      => $order->user->openid,
             'template_id' => 's1dJ2Tirds-kqLD4PGmfzHBEzJASinF8Gsn6bbgyZCU',
             'page'        => 'pages/show?id=' . $order->id,
             'form_id'     => $order->form_id,

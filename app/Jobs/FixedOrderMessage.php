@@ -10,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class NewOrderMessage implements ShouldQueue
+class FixedOrderMessage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -35,6 +35,6 @@ class NewOrderMessage implements ShouldQueue
     public function handle()
     {
         $message = new MessageController();
-        $message->newOrderMessage($this->order->id);
+        $message->fixedOrderMessage($this->order->id); // 完成工单提醒
     }
 }

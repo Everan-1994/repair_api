@@ -27,7 +27,7 @@ class MessageController extends Controller
     {
         $order = Order::whereId($id)->first();
 
-        return $this->app->template_message->send([
+        $this->app->template_message->send([
             'touser'      => $order->user->openid,
             'template_id' => 's1dJ2Tirds-kqLD4PGmfzHBEzJASinF8Gsn6bbgyZCU',
             'page'        => 'pages/show?id=' . $order->id,
@@ -45,8 +45,30 @@ class MessageController extends Controller
     /**
      * 工单完成提醒
      */
-    public function fixedOrderMessage($order)
+    public function fixedOrderMessage($id)
     {
+        $order = Order::whereId($id)->with('processes')->first();
 
+        foreach ($order->processes as $process) {
+            if ($process['type'] == 3) {
+                $end_time = $process['created_at'];
+            }
+        }
+
+        $total_time = strtotime($end_time) - strtotime($order->created_at->toDateTimeString());
+
+        $this->app->template_message->send([
+            'touser'      => $order->user->openid,
+            'template_id' => 'cgh4HpnxhQHWXzEL5sgoUOrLN6URPm1h0OIrfPS1qnI',
+            'page'        => 'pages/show?id=' . $order->id,
+            'form_id'     => $order->form_id,
+            'data'        => [
+                'keyword1' => $order->order,
+                'keyword2' => '工单已完成',
+                'keyword3' => $order->content,
+                'keyword4' => $order->created_at->toDateTimeString(),
+                'keyword5' => intval($total_time / 60) . '分' // 取整
+            ],
+        ]);
     }
 }

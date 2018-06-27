@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Jobs\NewOrderMessage;
+use App\Jobs\FixedOrderMessage;
 use App\Models\Order;
 use App\Models\Evaluate;
 use App\Models\Statement;
@@ -312,13 +312,13 @@ class OrdersController extends Controller
             $od->repair->notify(new OrderNotify($od));
 
             // 模板消息提醒(队列)
-            $msg = dispatch(new NewOrderMessage($od));
+            // $msg = dispatch(new NewOrderMessage($od));
 
             \DB::commit();
 
             return response([
                 'code' => 0,
-                'msg'  => $msg
+                'msg'  => 'Success'
             ], 201);
 
         } catch (\Exception $exception) {
@@ -346,6 +346,9 @@ class OrdersController extends Controller
                 'updated_at' => now()->toDateTimeString()
             ]);
             \DB::commit();
+
+            // 完成工单提醒
+            dispatch(new FixedOrderMessage($order));
 
             return response([
                 'code' => 0,

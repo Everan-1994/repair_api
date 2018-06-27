@@ -42,7 +42,7 @@ class OrdersController extends Controller
                     return $query->whereStatus($request->status);
                 }
             })
-            ->when($request->self == 1, function ($query) use ($user_id) {
+            ->when($request->self > 0, function ($query) use ($user_id) {
                 return $query->whereUserId($user_id);
             })
             ->when(!is_null($request->type), function ($query) use ($request) {
@@ -250,7 +250,7 @@ class OrdersController extends Controller
                         return $query->whereStatus(5);
                         break;
                     default:
-                        // 0 申报中 && 2 维修中
+                        // 0 维修中
                         return $query->whereStatus(2);
                         break;
                 }
@@ -345,10 +345,18 @@ class OrdersController extends Controller
                 'status'     => 3,
                 'updated_at' => now()->toDateTimeString()
             ]);
+
             \DB::commit();
 
+            $od = $order->whereId($request->order_id)->first();
+            // 通知用户工单已完成
+            $od->types = 3;
+            $od->user->notify(new OrderNotify($od));
+
             // 完成工单提醒
-            dispatch(new FixedOrderMessage($order->whereId($request->order_id)->first()));
+            // dispatch(new FixedOrderMessage($od));
+            $message = new MessageController();
+            $message->fixedOrderMessage($od->id);
 
             return response([
                 'code' => 0,
@@ -389,6 +397,13 @@ class OrdersController extends Controller
             ]);
 
             \DB::commit();
+
+            $od = $order->whereId($request->order_id)->first();
+            // 通知维修员工单已评价
+            $od->types = 4;
+            $od->repair->notify(new OrderNotify($od));
+
+
 
             return response([
                 'code' => 0,

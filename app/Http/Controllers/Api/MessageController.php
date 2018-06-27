@@ -21,28 +21,6 @@ class MessageController extends Controller
     }
 
     /**
-     * 新工单提醒
-     */
-    public function newOrderMessage($id)
-    {
-        $order = Order::whereId($id)->first();
-
-        $this->app->template_message->send([
-            'touser'      => $order->user->openid,
-            'template_id' => 's1dJ2Tirds-kqLD4PGmfzHBEzJASinF8Gsn6bbgyZCU',
-            'page'        => 'pages/show?id=' . $order->id,
-            'form_id'     => $order->form_id,
-            'data'        => [
-                'keyword1' => $order->order,
-                'keyword2' => '新工单',
-                'keyword3' => $order->user->name,
-                'keyword4' => $order->content,
-                'keyword5' => $order->created_at->toDateTimeString()
-            ],
-        ]);
-    }
-
-    /**
      * 工单完成提醒
      */
     public function fixedOrderMessage($id)
@@ -67,7 +45,38 @@ class MessageController extends Controller
                 'keyword2' => '工单已完成',
                 'keyword3' => $order->content,
                 'keyword4' => $order->created_at->toDateTimeString(),
-                'keyword5' => intval($total_time / 60) . '分' // 取整
+                'keyword5' => intval($total_time / 60) . '分钟' // 取整
+            ],
+        ]);
+    }
+
+    /**
+     * 工单评价提醒
+     */
+    public function evaluateOrderMessage($id)
+    {
+        $order = Order::whereId($id)->with('processes')->first();
+
+        foreach ($order->processes as $process) {
+            if ($process['type'] == 5) {
+                $evaluate = $process['evaluate'];
+                $service = $process['service'];
+                $efficiency = $process['efficiency'];
+                $content = $process['content'];
+            }
+        }
+
+        $this->app->template_message->send([
+            'touser'      => $order->repair->openid,
+            'template_id' => '',
+            'page'        => 'pages/show?id=' . $order->id,
+            'form_id'     => $order->form_id,
+            'data'        => [
+                'keyword1' => $order->order,
+                'keyword2' => $evaluate,
+                'keyword3' => $service . '颗星',
+                'keyword4' => $efficiency . '颗星',
+                'keyword5' => $content
             ],
         ]);
     }

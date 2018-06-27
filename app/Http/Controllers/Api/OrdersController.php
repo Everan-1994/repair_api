@@ -22,12 +22,15 @@ class OrdersController extends Controller
 
         $order = Order::whereSchoolId($request->school_id)
             ->with(['area', 'images', 'user', 'repair'])
+            ->when($request->self > 0, function ($query) use ($user_id) {
+                return $query->whereUserId($user_id);
+            })
             ->when(isset($request->status), function ($query) use ($request) {
-                if ($request->self == 1) {
+                if ($request->self > 0) {
                     switch ($request->status) {
                         case 1:
                             // 3 已完成 && 5 已评价
-                            return $query->whereStatus(3)->orWhere('status', 5);
+                            return $query->where('status', 3)->orWhere('status', 5);
                             break;
                         case 2:
                             // 4 申述中
@@ -41,9 +44,6 @@ class OrdersController extends Controller
                 } else {
                     return $query->whereStatus($request->status);
                 }
-            })
-            ->when($request->self > 0, function ($query) use ($user_id) {
-                return $query->whereUserId($user_id);
             })
             ->when(!is_null($request->type), function ($query) use ($request) {
                 return $query->whereType($request->type);

@@ -20,4 +20,13 @@ class NotificationsController extends Controller
             'unread_count' => \Auth::user()->notification_count,
         ]);
     }
+
+    public function read()
+    {
+        \Auth::user()->markAsRead();
+
+        return response([
+            'msg' => 'success'
+        ], 204);
+    }
 }

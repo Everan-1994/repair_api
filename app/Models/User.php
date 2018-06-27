@@ -59,4 +59,11 @@ class User extends Authenticatable implements JWTSubject
         $this->increment('notification_count'); // 未读消息 + 1
         $this->laravelNotify($instance);
     }
+    // 清空消息 设置未读数为 0
+    public function markAsRead()
+    {
+        $this->notification_count = 0;
+        $this->save();
+        $this->unreadNotifications->markAsRead();
+    }
 }

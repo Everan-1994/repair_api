@@ -151,6 +151,9 @@ $api->group([
             // 通知统计
             $api->get('user/notifications/stats', 'NotificationsController@stats')
                 ->name('api.user.notifications.stats');
+            // 设置消息已读
+            $api->put('user/read/notifications', 'NotificationsController@read')
+                ->name('api.user.notifications.read');
         });
 
     });

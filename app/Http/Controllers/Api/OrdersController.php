@@ -348,7 +348,7 @@ class OrdersController extends Controller
             \DB::commit();
 
             // 完成工单提醒
-            dispatch(new FixedOrderMessage($order));
+            dispatch(new FixedOrderMessage($order->whereId($request->order_id)->first()));
 
             return response([
                 'code' => 0,

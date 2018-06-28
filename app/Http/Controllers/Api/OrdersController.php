@@ -189,7 +189,7 @@ class OrdersController extends Controller
     }
 
     /**
-     * 申报回复(驳回)
+     * 申报回复(驳回) or 已完成维修
      */
     public function replies(Request $request)
     {
@@ -222,6 +222,19 @@ class OrdersController extends Controller
             }
 
             \DB::commit();
+
+            $od = Order::whereId($request->order_id)->first();
+
+            if ($request->order_status == 3) {
+                // 通知用户工单已完成
+                $od->types = 3;
+                $od->user->notify(new OrderNotify($od));
+            } else {
+                // 通知用户工单被驳回
+                $od->types = 0;
+                $od->user->notify(new OrderNotify($od));
+            }
+
         } catch (\Exception $exception) {
             \DB::rollBack();
             return response(['error' => $exception->getMessage()], 500);

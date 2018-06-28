@@ -30,8 +30,8 @@ class OrderNotify extends Notification
             'order_id'  => $this->order->id,
             'order'     => $this->order->order,
             'content'   => $this->order->content,
-            'name'      => $this->order->types == 1 ? $this->order->user->name : $this->order->repair->truename,
-            'avatar'    => $this->order->types == 1 ? $this->order->user->avatar : $this->order->repair->avatar,
+            'name'      => $this->order->types <= 1 ? $this->order->user->name : $this->order->repair->truename,
+            'avatar'    => $this->order->types <= 1 ? $this->order->user->avatar : $this->order->repair->avatar,
             'status'    => $this->order->status,
             'image_rul' => $this->order->images
         ];

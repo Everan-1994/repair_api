@@ -154,6 +154,31 @@ $api->group([
             // 设置消息已读
             $api->put('user/read/notifications', 'NotificationsController@read')
                 ->name('api.user.notifications.read');
+
+            // 文章列表
+            $api->get('article', 'ArticlesController@index')
+                ->name('api.article.index');
+            // 新增文章
+            $api->post('article', 'ArticlesController@store')
+                ->name('api.article.store');
+            // 更新文章
+            $api->patch('article', 'ArticlesController@update')
+                ->name('api.article.update');
+            // 变更状态
+            $api->patch('article/status', 'ArticlesController@changeStatus')
+                ->name('api.article.changeStatus');
+            // 删除文章
+            $api->delete('article/{article}', 'ArticlesController@del')
+                ->name('api.article.del');
+            // 文章详情
+            $api->get('article/{article}', 'ArticlesController@show')
+                ->name('api.article.show');
+            // 文章图片
+            $api->post('article/image', 'ArticlesController@upload')
+                ->name('api.article.upload');
+            // 文章阅读数
+            $api->put('article/views', 'ArticlesController@views')
+                ->name('api.article.views');
         });
 
     });

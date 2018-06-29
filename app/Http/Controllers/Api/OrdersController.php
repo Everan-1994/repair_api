@@ -23,7 +23,7 @@ class OrdersController extends Controller
         $order = Order::whereSchoolId($request->school_id)
             ->with(['area', 'images', 'user', 'repair'])
             ->when($request->self > 0, function ($query) use ($user_id) {
-                return $query->whereUserId($user_id);
+                return $query->where('user_id', $user_id);
             })
             ->when(isset($request->status), function ($query) use ($request) {
                 if ($request->self > 0) {

@@ -31,7 +31,7 @@ class OrdersController extends Controller
                         case 1:
                             // 3 已完成 && 5 已评价
                             // return $query->where('status', 3)->orWhere('status', 5);
-                            return $query->whereRaw('status = ? OR status = ?', [3, 5]);
+                            return $query->whereRaw('(status = ? OR status = ?)', [3, 5]);
                             break;
                         case 2:
                             // 4 申述中

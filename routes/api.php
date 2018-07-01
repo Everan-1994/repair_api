@@ -179,6 +179,23 @@ $api->group([
             // 文章阅读数
             $api->put('article/views', 'ArticlesController@views')
                 ->name('api.article.views');
+
+            // 首页接口
+            // 用户总数
+            $api->get('user/count', 'UsersController@getUserCount')
+                ->name('api.user.getUserCount');
+            // 今日新工单 & 今日已完成工单 & 工单总数
+            $api->get('order/count', 'OrdersController@getOrderCount')
+                ->name('api.order.getOrderCount');
+            // 好评率
+            $api->get('order/evaluate', 'OrdersController@getRepairEvaluate')
+                ->name('api.order.getRepairEvaluate');
+            // 申报类型比例
+            $api->get('order/type/ratio', 'TypesController@getOrderTypeRatio')
+                ->name('api.type.getOrderTypeRatio');
+            // 上周申报量
+            $api->get('week/order', 'OrdersController@getWeekOrder')
+                ->name('api.order.getWeekOrder');
         });
 
     });

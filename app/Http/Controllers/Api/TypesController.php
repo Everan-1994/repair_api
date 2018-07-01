@@ -40,4 +40,21 @@ class TypesController extends Controller
             'msg' => '更新成功'
         ]);
     }
+
+    /**
+     * 类型比率
+     */
+    public function getOrderTypeRatio(Request $request, Type $type)
+    {
+        $list = $type->where('school_id', $request->school_id)->with('orders')->get();
+
+        foreach ($list as $key => $val) {
+            $data[$key] = [
+                'type' => $val['name'],
+                'count' => count($val['orders'])
+            ];
+        }
+
+        return response($data);
+    }
 }

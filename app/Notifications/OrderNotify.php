@@ -24,14 +24,20 @@ class OrderNotify extends Notification
 
     public function toDatabase($notifiable)
     {
+        if (in_array($this->order->types, [0, 2, 3])) {
+            $bool = true;
+        } else {
+            $bool = false;
+        }
+
         // 存入数据库data字段里的数据
         return [
             'type'      => $this->order->types,
             'order_id'  => $this->order->id,
             'order'     => $this->order->order,
             'content'   => $this->order->content,
-            'name'      => $this->order->types <= 1 ? $this->order->user->name : $this->order->repair->truename,
-            'avatar'    => $this->order->types <= 1 ? $this->order->user->avatar : $this->order->repair->avatar,
+            'name'      => $bool ? $this->order->user->name : $this->order->repair->truename,
+            'avatar'    => $bool ? $this->order->user->avatar : $this->order->repair->avatar,
             'status'    => $this->order->status,
             'image_rul' => $this->order->images
         ];

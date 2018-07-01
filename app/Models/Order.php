@@ -9,7 +9,8 @@ class Order extends Model
     protected $fillable = [
         'order', 'type', 'area_id',
         'address', 'content', 'school_id',
-        'user_id', 'repair_id', 'form_id'
+        'user_id', 'repair_id', 'form_id',
+        'repair_form_id'
     ];
 
     public function area()

@@ -68,15 +68,15 @@ class MessageController extends Controller
 
         $this->app->template_message->send([
             'touser'      => $order->repair->openid,
-            'template_id' => '',
+            'template_id' => 'tYB2lN_ZYlbVwthCbF43EZzOyRX2kBwmqmX5bNMQQik',
             'page'        => 'pages/show?id=' . $order->id,
-            'form_id'     => $order->form_id,
+            'form_id'     => $order->repair_form_id,
             'data'        => [
                 'keyword1' => $order->order,
-                'keyword2' => $evaluate,
-                'keyword3' => $service . '颗星',
-                'keyword4' => $efficiency . '颗星',
-                'keyword5' => $content
+                'keyword2' => $content,
+                'keyword3' => $evaluate,
+                'keyword4' => $service . '颗星',
+                'keyword5' => $efficiency . '颗星'
             ],
         ]);
     }

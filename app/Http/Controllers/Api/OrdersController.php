@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Jobs\FixedOrderMessage;
+use App\Models\User;
 use App\Models\Order;
 use App\Models\Evaluate;
 use App\Models\Statement;
 use App\Models\OrderImages;
 use App\Models\OrderProcess;
-use App\Models\User;
-use App\Notifications\OrderNotify;
 use Illuminate\Http\Request;
+use App\Jobs\FixedOrderMessage;
+use App\Notifications\OrderNotify;
 use App\Http\Resources\OrderResource;
 use App\Http\Requests\Api\OrderRequest;
 
@@ -96,7 +96,7 @@ class OrdersController extends Controller
 
             return response([
                 'code' => 0,
-                'msg' => 'success'
+                'msg'  => 'success'
             ]);
         } catch (\Exception $exception) {
             \DB::rollBack();
@@ -356,8 +356,9 @@ class OrdersController extends Controller
 
             // 更新工单
             $order->whereId($request->order_id)->update([
-                'status'     => 3,
-                'updated_at' => now()->toDateTimeString()
+                'status'         => 3,
+                'repair_form_id' => $request->form_id, // 完成工单使用
+                'updated_at'     => now()->toDateTimeString()
             ]);
 
             \DB::commit();
@@ -367,7 +368,7 @@ class OrdersController extends Controller
             $od->types = 3;
             $od->user->notify(new OrderNotify($od));
 
-            // 完成工单提醒
+            // 完成工单提醒 模板消息
             // dispatch(new FixedOrderMessage($od));
             $message = new MessageController();
             $message->fixedOrderMessage($od->id);
@@ -417,7 +418,9 @@ class OrdersController extends Controller
             $od->types = 4;
             $od->repair->notify(new OrderNotify($od));
 
-
+            // 评价 模板消息发送
+            $message = new MessageController();
+            $message->evaluateOrderMessage($od->id);
 
             return response([
                 'code' => 0,
@@ -470,5 +473,96 @@ class OrdersController extends Controller
             \DB::rollBack();
             return response(['error' => $exception->getMessage()], 500);
         }
+    }
+
+    /**
+     * 今日新工单 & 今日已完成工单 & 工单总数
+     */
+    public function getOrderCount(Request $request, Order $order)
+    {
+        $type = $request->type ?: 0;
+        $today = now()->toDateString();
+
+        $count = $order->where('school_id', $request->school_id)
+            ->when($type > 0, function ($query) use ($type, $today) {
+                switch ($type) {
+                    case 1:
+                        // 今日新工单
+                        return $query->whereStatus(0)->whereDate('created_at', $today);
+                        break;
+                    case 2:
+                        // 今日已完成工单
+                        return $query->whereRaw('(status = ? OR status = ?)', [3, 5])
+                            ->whereDate('created_at', $today);
+                        break;
+                }
+            })
+            ->count();
+
+        return response(['count' => $count]);
+    }
+
+    public function getRepairEvaluate(Request $request, Order $order)
+    {
+        $list = $order->where('school_id', $request->school_id)->with('evaluate')->get()->toArray();
+
+        $data = [
+            'hp' => 0,
+            'zp' => 0,
+            'cp' => 0
+        ];
+
+        foreach ($list as $k => $eva) {
+            if (!is_null($eva['evaluate'])) {
+                switch ($eva['evaluate']['evaluate']) {
+                    case '好评':
+                        $data['hp']++;
+                        break;
+                    case '中评':
+                        $data['zp']++;
+                        break;
+                    case '差评':
+                        $data['cp']++;
+                        break;
+                }
+            }
+        }
+
+        return response($data);
+    }
+
+    /**
+     * 最近七天申报量
+     */
+    public function getWeekOrder(Request $request)
+    {
+        $list = \DB::select("
+                    select
+                      DATE_FORMAT(a.created_at, '%m-%d') as days,
+                      ifnull(b.count,0) as count
+                    from (
+                           SELECT date_sub(curdate(), interval 1 day) as created_at
+                           union all
+                           SELECT date_sub(curdate(), interval 2 day) as created_at
+                           union all
+                           SELECT date_sub(curdate(), interval 3 day) as created_at
+                           union all
+                           SELECT date_sub(curdate(), interval 4 day) as created_at
+                           union all
+                           SELECT date_sub(curdate(), interval 5 day) as created_at
+                           union all
+                           SELECT date_sub(curdate(), interval 6 day) as created_at
+                           union all
+                           SELECT date_sub(curdate(), interval 7 day) as created_at
+                         ) a left join (
+                                         select date(created_at) as datetime, count(*) as count
+                                         from orders
+                                         where school_id = ?
+                                         group by date(created_at)
+                                       ) b on a.created_at = b.datetime
+                                       order by days desc
+                ", [$request->school_id]);
+
+        return response($list);
     }
 }

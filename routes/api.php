@@ -76,6 +76,9 @@ $api->group([
             // 获取个人信息
             $api->get('user', 'UsersController@info')
                 ->name('api.user.info');
+            // 修改密码
+            $api->patch('user/changePwd', 'UsersController@changePwd')
+                ->name('api.user.changePwd');
             // 区域列表
             $api->get('area', 'AreasController@index')
                 ->name('api.area.index');
@@ -196,6 +199,12 @@ $api->group([
             // 上周申报量
             $api->get('week/order', 'OrdersController@getWeekOrder')
                 ->name('api.order.getWeekOrder');
+            // 每月申报量
+            $api->get('month/order', 'OrdersController@getMonthOrder')
+                ->name('api.order.getMonthOrder');
+            // 每月申报量
+            $api->get('user/order', 'UsersController@getUserOrderCount')
+                ->name('api.user.getUserOrderCount');
         });
 
     });

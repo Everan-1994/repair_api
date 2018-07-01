@@ -66,4 +66,10 @@ class User extends Authenticatable implements JWTSubject
         $this->save();
         $this->unreadNotifications->markAsRead();
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'repair_id', 'id')
+            ->with('evaluate');
+    }
 }

@@ -565,4 +565,51 @@ class OrdersController extends Controller
 
         return response($list);
     }
+
+    /**
+     * 每月申报量
+     */
+    public function getMonthOrder(Request $request, Order $order)
+    {
+        $list = $order->where('school_id', $request->school_id)
+            ->select(\DB::raw("DATE_FORMAT(created_at,'%Y-%m') as times, COUNT(*) as count"))
+            ->groupBy('times')
+            ->get()
+            ->toArray();
+
+        // 构造12个月 YYYY-MM
+        for ($i = 0; $i <= 11; $i++) {
+            $month = now()->modify('-' . $i . ' months')->toDateString();
+            $ms[$i] = substr($month, 0, 7);
+        }
+
+        $ms = array_reverse($ms); // 倒序排列
+
+        foreach ($ms as $c => $w) {
+            foreach ($list as $k => $v) {
+                if (hash_equals($w, $v['times'])) {
+                    $data[$c][$k] = $v;
+                } else {
+                    $data[$c][$k] = [
+                        'times' => $w,
+                        'count' => 0
+                    ];
+                }
+            }
+        }
+
+        foreach ($data as $k => $v) {
+            $sum[$k] = [];
+            foreach ($v as $c => $w) {
+                array_push($sum[$k], $w['count']);
+            }
+
+            $date[$k] = [
+                'day'   => $v[0]['times'],
+                'count' => array_sum($sum[$k])
+            ];
+        }
+
+        return response($date);
+    }
 }

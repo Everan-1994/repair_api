@@ -15,6 +15,19 @@ class UsersController extends Controller
         return new UserResource($user);
     }
 
+    // 修改密码
+    public function changePwd(Request $request)
+    {
+        $user = User::whereId(\Auth::guard('api')->id())->first();
+        $user->password = bcrypt($request->new_pwd);
+        $user->save();
+
+        return response([
+            'code' => 0,
+            'msg' => 'Success'
+        ]);
+    }
+
     /**
      * 用户总数
      */
@@ -23,5 +36,34 @@ class UsersController extends Controller
         $count = User::where('school_id', $request->school_id)->count();
 
         return response(['count' => $count]);
+    }
+
+    /**
+     * 维修员工单
+     */
+    public function getUserOrderCount(Request $request)
+    {
+        $list = User::where([
+                'school_id' => $request->school_id,
+                'identify' => 4
+            ])
+            ->with('orders')
+            ->get()
+            ->toArray();
+
+        foreach ($list as $k => $v) {
+            $evaluate[$k] = 0;
+            foreach ($v['orders'] as $c => $w) {
+                is_null($w['evaluate']) ?: $evaluate[$k]++;
+            }
+
+            $data[$k] = [
+                'name' => $v['truename'],
+                'order_count' => count($v['orders']),
+                'evaluate' => $evaluate[$k]
+            ];
+        }
+
+        return response($data);
     }
 }

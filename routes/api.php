@@ -88,6 +88,19 @@ $api->group([
             // 新增区域
             $api->post('area', 'AreasController@store')
                 ->name('api.area.store');
+            // 新增区域
+            $api->patch('area/{area}', 'AreasController@update')
+                ->name('api.area.update');
+            // 区域详情
+            $api->get('area/{area}', 'AreasController@show')
+                ->name('api.area.show');
+            // 变更状态
+            $api->patch('area/status/{area}', 'AreasController@changeStatus')
+                ->name('api.member.changeStatus');
+            // 删除区域
+            $api->delete('area/{area}', 'AreasController@del')
+                ->name('api.area.del');
+
             // 小程序用户更新
             $api->put('customer', 'CustomersController@weappUserUpdate')
                 ->name('api.customer.weappUserUpdate');
@@ -134,6 +147,9 @@ $api->group([
             // 类型列表
             $api->patch('type/{type}', 'TypesController@update')
                 ->name('api.type.update');
+            // 删除类型
+            $api->delete('type/{type}', 'TypesController@del')
+                ->name('api.type.del');
 
             // 派工
             $api->post('dispatch', 'OrdersController@dispatchs')

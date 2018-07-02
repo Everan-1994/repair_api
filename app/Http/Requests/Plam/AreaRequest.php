@@ -16,6 +16,9 @@ class AreaRequest extends Request
                 ];
                 break;
             case 'PATCH':
+                $rules = [
+                    'name'      => 'required'
+                ];
                 break;
         }
 

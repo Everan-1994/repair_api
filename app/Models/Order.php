@@ -10,7 +10,7 @@ class Order extends Model
         'order', 'type', 'area_id',
         'address', 'content', 'school_id',
         'user_id', 'repair_id', 'form_id',
-        'repair_form_id'
+        'repair_form_id', 'status'
     ];
 
     public function area()

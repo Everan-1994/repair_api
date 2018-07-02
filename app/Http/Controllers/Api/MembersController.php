@@ -43,7 +43,10 @@ class MembersController extends Controller
             ], 400);
         }
 
-        User::whereId($request->user_id)->update(['identify' => $request->identify]);
+        User::whereId($request->user_id)->update([
+            'identify' => $request->identify,
+            'truename' => $request->repair_name
+        ]);
 
         return response([
             'code' => 0,

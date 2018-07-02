@@ -57,4 +57,14 @@ class TypesController extends Controller
 
         return response($data);
     }
+
+    public function del(Type $type)
+    {
+        $type->delete();
+
+        return response([
+            'code' => 0,
+            'msg'  => 'Successed'
+        ], 204);
+    }
 }

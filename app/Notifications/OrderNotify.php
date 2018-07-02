@@ -24,7 +24,7 @@ class OrderNotify extends Notification
 
     public function toDatabase($notifiable)
     {
-        if (in_array($this->order->types, [0, 1, 2, 3])) {
+        if (in_array($this->order->types, [0, 2, 3, 5])) {
             $bool = true;
         } else {
             $bool = false;
@@ -38,8 +38,7 @@ class OrderNotify extends Notification
             'content'   => $this->order->content,
             'name'      => $bool ? $this->order->user->name : $this->order->repair->truename,
             'avatar'    => $bool ? $this->order->user->avatar : $this->order->repair->avatar,
-            'status'    => $this->order->status,
-            'image_rul' => $this->order->images
+            'status'    => $this->order->status
         ];
     }
 }

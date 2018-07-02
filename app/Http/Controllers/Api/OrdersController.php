@@ -376,7 +376,7 @@ class OrdersController extends Controller
             return response([
                 'code' => 0,
                 'msg'  => 'success'
-            ]);
+            ], 201);
         } catch (\Exception $exception) {
             \DB::rollBack();
             return response(['error' => $exception->getMessage()], 500);

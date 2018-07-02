@@ -64,8 +64,6 @@ class MessageController extends Controller
             foreach ($order->processes as $process) {
                 if ($process['type'] == 5) {
                     $evaluate = $process['evaluate'];
-                    $service = $process['service'];
-                    $efficiency = $process['efficiency'];
                     $content = $process['content'];
                 }
             }
@@ -78,9 +76,9 @@ class MessageController extends Controller
                 'data'        => [
                     'keyword1' => $order->order,
                     'keyword2' => $content,
-                    'keyword3' => $evaluate,
-                    'keyword4' => $service . '颗星',
-                    'keyword5' => $efficiency . '颗星'
+                    'keyword3' => $evaluate['evaluate'],
+                    'keyword4' => $evaluate['service'] . '颗星',
+                    'keyword5' => $$evaluate['efficiency'] . '颗星'
                 ],
             ]);
         }

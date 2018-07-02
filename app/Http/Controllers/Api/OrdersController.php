@@ -60,6 +60,42 @@ class OrdersController extends Controller
         // 生成15位唯一订单号
         $order_sn = createOrderNm();
 
+        $od = $order->create([
+            'order'     => $order_sn,
+            'school_id' => $orderRequest->school_id,
+            'area_id'   => $orderRequest->area_id,
+            'type'      => $orderRequest->type,
+            'address'   => $orderRequest->address,
+            'content'   => $orderRequest->contents,
+            'user_id'   => \Auth::id(),
+            'status'    => 0,
+            'form_id'   => $orderRequest->form_id
+        ]);
+
+        if (!empty($orderRequest->imagesUrl)) {
+            foreach ($orderRequest->imagesUrl as $val) {
+                $arr[] = [
+                    'order_id'   => $od['id'],
+                    'image_url'  => $val,
+                    'created_at' => now()->toDateTimeString(),
+                    'updated_at' => now()->toDateTimeString()
+                ];
+            }
+            OrderImages::insert($arr);
+        }
+
+        // 通知管理员有新工单
+        $ods = $order->whereId($od['id'])->first();
+        $ods->types = 5;
+        dd($ods->toArray());
+        $user = User::where(['school_id' => $od['school_id'], 'identify' => 2])->first();
+        $user->notify(new OrderNotify($ods));
+
+        return response([
+            'code' => 0,
+            'msg'  => 'success'
+        ]);
+
         \DB::beginTransaction();
         try {
             $od = $order->create([

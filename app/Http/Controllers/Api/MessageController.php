@@ -35,21 +35,19 @@ class MessageController extends Controller
 
         $total_time = strtotime($end_time) - strtotime($order->created_at->toDateTimeString());
 
-        if (!$order->form_id && $order->form_id !== 'the formId is a mock one') {
-            $this->app->template_message->send([
-                'touser'      => $order->user->openid,
-                'template_id' => 'cgh4HpnxhQHWXzEL5sgoUOrLN6URPm1h0OIrfPS1qnI',
-                'page'        => 'pages/show?id=' . $order->id,
-                'form_id'     => $order->form_id,
-                'data'        => [
-                    'keyword1' => $order->order,
-                    'keyword2' => '工单已完成',
-                    'keyword3' => $order->content,
-                    'keyword4' => $order->created_at->toDateTimeString(),
-                    'keyword5' => intval($total_time / 60) . '分钟' // 取整
-                ],
-            ]);
-        }
+        $this->app->template_message->send([
+            'touser'      => $order->user->openid,
+            'template_id' => 'cgh4HpnxhQHWXzEL5sgoUOrLN6URPm1h0OIrfPS1qnI',
+            'page'        => 'pages/show?id=' . $order->id,
+            'form_id'     => $order->form_id,
+            'data'        => [
+                'keyword1' => $order->order,
+                'keyword2' => '工单已完成',
+                'keyword3' => $order->content,
+                'keyword4' => $order->created_at->toDateTimeString(),
+                'keyword5' => intval($total_time / 60) . '分钟' // 取整
+            ],
+        ]);
 
     }
 
@@ -60,27 +58,25 @@ class MessageController extends Controller
     {
         $order = Order::whereId($id)->with('processes')->first();
 
-        if (!$order->repair_form_id && $order->repair_form_id !== 'the formId is a mock one') {
-            foreach ($order->processes as $process) {
-                if ($process['type'] == 5) {
-                    $evaluate = $process['evaluate'];
-                    $content = $process['content'];
-                }
+        foreach ($order->processes as $process) {
+            if ($process['type'] == 5) {
+                $evaluate = $process['evaluate'];
+                $content = $process['content'];
             }
-
-            $this->app->template_message->send([
-                'touser'      => $order->repair->openid,
-                'template_id' => 'tYB2lN_ZYlbVwthCbF43EZzOyRX2kBwmqmX5bNMQQik',
-                'page'        => 'pages/show?id=' . $order->id,
-                'form_id'     => $order->repair_form_id,
-                'data'        => [
-                    'keyword1' => $order->order,
-                    'keyword2' => $content,
-                    'keyword3' => $evaluate['evaluate'],
-                    'keyword4' => $evaluate['service'] . '颗星',
-                    'keyword5' => $$evaluate['efficiency'] . '颗星'
-                ],
-            ]);
         }
+
+        $this->app->template_message->send([
+            'touser'      => $order->repair->openid,
+            'template_id' => 'tYB2lN_ZYlbVwthCbF43EZzOyRX2kBwmqmX5bNMQQik',
+            'page'        => 'pages/show?id=' . $order->id,
+            'form_id'     => $order->repair_form_id,
+            'data'        => [
+                'keyword1' => $order->order,
+                'keyword2' => $content,
+                'keyword3' => $evaluate['evaluate'],
+                'keyword4' => $evaluate['service'] . '颗星',
+                'keyword5' => $$evaluate['efficiency'] . '颗星'
+            ],
+        ]);
     }
 }

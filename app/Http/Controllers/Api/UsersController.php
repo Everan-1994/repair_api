@@ -51,17 +51,21 @@ class UsersController extends Controller
             ->get()
             ->toArray();
 
-        foreach ($list as $k => $v) {
-            $evaluate[$k] = 0;
-            foreach ($v['orders'] as $c => $w) {
-                is_null($w['evaluate']) ?: $evaluate[$k]++;
-            }
+        if ($list) {
+            foreach ($list as $k => $v) {
+                $evaluate[$k] = 0;
+                foreach ($v['orders'] as $c => $w) {
+                    is_null($w['evaluate']) ?: $evaluate[$k]++;
+                }
 
-            $data[$k] = [
-                'name' => $v['truename'],
-                'order_count' => count($v['orders']),
-                'evaluate' => $evaluate[$k]
-            ];
+                $data[$k] = [
+                    'name' => $v['truename'],
+                    'order_count' => count($v['orders']),
+                    'evaluate' => $evaluate[$k]
+                ];
+            }
+        } else {
+            $data = [];
         }
 
         return response($data);

@@ -48,11 +48,15 @@ class TypesController extends Controller
     {
         $list = $type->where('school_id', $request->school_id)->with('orders')->get();
 
-        foreach ($list as $key => $val) {
-            $data[$key] = [
-                'type' => $val['name'],
-                'count' => count($val['orders'])
-            ];
+        if ($list) {
+            foreach ($list as $key => $val) {
+                $data[$key] = [
+                    'type' => $val['name'],
+                    'count' => count($val['orders'])
+                ];
+            }
+        } else {
+            $data = [];
         }
 
         return response($data);

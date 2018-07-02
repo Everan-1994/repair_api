@@ -29,7 +29,7 @@ class OrderNotify extends Notification
         } else {
             $bool = false;
         }
-
+        dd($this->order);
         // 存入数据库data字段里的数据
         return [
             'type'      => $this->order->types,

@@ -24,7 +24,7 @@ class OrderNotify extends Notification
 
     public function toDatabase($notifiable)
     {
-        if (in_array($this->order->types, [0, 2, 3])) {
+        if (in_array($this->order->types, [0, 1, 2, 3])) {
             $bool = true;
         } else {
             $bool = false;

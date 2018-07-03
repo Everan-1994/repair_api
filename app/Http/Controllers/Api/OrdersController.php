@@ -405,9 +405,9 @@ class OrdersController extends Controller
             $od->user->notify(new OrderNotify($od));
 
             // 完成工单提醒 模板消息
-             dispatch(new FixedOrderMessage($od));
-//            $message = new MessageController();
-//            $message->fixedOrderMessage($od->id);
+            // dispatch(new FixedOrderMessage($od));
+            $message = new MessageController();
+            $message->fixedOrderMessage($od->id);
 
             return response([
                 'code' => 0,

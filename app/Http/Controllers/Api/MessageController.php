@@ -35,7 +35,7 @@ class MessageController extends Controller
 
         $total_time = strtotime($end_time) - strtotime($order->created_at->toDateTimeString());
 
-        if (!$order->form_id && $order->form_id !== 'the formId is a mock one') {
+        if ($order->form_id && $order->form_id !== 'the formId is a mock one') {
             $this->app->template_message->send([
                 'touser'      => $order->user->openid,
                 'template_id' => 'cgh4HpnxhQHWXzEL5sgoUOrLN6URPm1h0OIrfPS1qnI',
@@ -60,7 +60,7 @@ class MessageController extends Controller
     {
         $order = Order::whereId($id)->with('processes')->first();
 
-        if (!$order->repair_form_id && $order->repair_form_id !== 'the formId is a mock one') {
+        if ($order->repair_form_id && $order->repair_form_id !== 'the formId is a mock one') {
             foreach ($order->processes as $process) {
                 if ($process['type'] == 5) {
                     $evaluate = $process['evaluate']['evaluate'];

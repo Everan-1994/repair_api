@@ -11,16 +11,17 @@ class AuthorizationsController extends Controller
 {
     public function login(Request $request)
     {
-        if (app()->environment('production')) {
-            $verifyData = \Cache::get($request->captcha_key);
+//        if (app()->environment('production')) {
+//            线上环境
+//        }
+        $verifyData = \Cache::get($request->captcha_key);
 
-            if (!$verifyData) {
-                return response(['error' => '无效的验证码'], 422);
-            }
+        if (!$verifyData) {
+            return response(['error' => '无效的验证码'], 422);
+        }
 
-            if (!hash_equals($verifyData['code'], $request->captcha)) {
-                return response(['error' => '验证码不匹配'], 400);
-            }
+        if (!hash_equals($verifyData['code'], $request->captcha)) {
+            return response(['error' => '验证码不匹配'], 400);
         }
 
         $username = $request->username;

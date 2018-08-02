@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Evaluate;
@@ -615,9 +616,10 @@ class OrdersController extends Controller
 
         if ($list) {
             // 构造12个月 YYYY-MM
+            $now = substr(now()->toDateString(), 0, 7) . '-01';
             for ($i = 0; $i <= 11; $i++) {
-                $month = now()->modify('-' . $i . ' months')->toDateString();
-                $ms[$i] = substr($month, 0, 7);
+                $month = Carbon::parse($now)->modify('-' . $i . ' months')->toDateString();
+                $ms[$i] = substr($month, 0, 7); // YYYY-MM
             }
 
             $ms = array_reverse($ms); // 倒序排列

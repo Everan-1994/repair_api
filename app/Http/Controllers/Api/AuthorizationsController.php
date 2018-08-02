@@ -74,7 +74,7 @@ class AuthorizationsController extends Controller
         if (!$user) {
             $user = User::create([
                 'name'     => $request->nickname,
-                'sex'      => $request->sex,
+                'sex'      => $request->sex ?: 1,
                 'avatar'   => $request->avatar,
                 'status'   => 1,
                 'password' => bcrypt('Everan9457'),

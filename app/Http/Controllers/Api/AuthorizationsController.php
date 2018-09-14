@@ -6,6 +6,7 @@ use App\Http\Requests\Api\WeappAuthorizationRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
 class AuthorizationsController extends Controller
 {
@@ -115,5 +116,17 @@ class AuthorizationsController extends Controller
         $map['status'] = 1;
 
         return \Auth::attempt($map);
+    }
+
+    public function tts()
+    {
+        // 创建客户角色
+        $maintainer = Role::create(['name' => 'Customer']);
+        $maintainer->givePermissionTo('manage_orders');
+
+        $user = \DB::table('users')->whereId(17)->first();
+        $user->assignRole('Customer');
+
+        return response()->json(['msg' => $user]);
     }
 }

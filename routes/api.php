@@ -22,6 +22,9 @@ $api->group([
         // 登录
         $api->post('login', 'AuthorizationsController@login')
             ->name('api.authorizations.login');
+        // 登录
+        $api->post('tts', 'AuthorizationsController@tts')
+            ->name('api.authorizations.tts');
         // 小程序登录
         $api->post('weapp/authorizations', 'AuthorizationsController@weappStore')
             ->name('api.weapp.authorizations.store');

@@ -118,15 +118,4 @@ class AuthorizationsController extends Controller
         return \Auth::attempt($map);
     }
 
-    public function tts()
-    {
-        // 创建客户角色
-        $maintainer = Role::create(['name' => 'Customer']);
-        $maintainer->givePermissionTo('manage_orders');
-
-        $user = \DB::table('users')->whereId(17)->first();
-        $user->assignRole('Customer');
-
-        return response()->json(['msg' => $user]);
-    }
 }

@@ -22,6 +22,7 @@ class OrderResource extends Resource
             'evaluate'       => $this->whenLoaded('evaluate'),
             'repair_id'      => $this->repair_id,
             'status'         => $this->status,
+            'form_id'        => $this->form_id,
             'created_at'     => $this->created_at->toDateTimeString(),
             'updated_at'     => $this->updated_at->toDateTimeString(),
         ];

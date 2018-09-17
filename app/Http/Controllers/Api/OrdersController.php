@@ -392,7 +392,7 @@ class OrdersController extends Controller
             // 新增进度
             $orderProcess->create([
                 'type' => 3,
-                'user_id' => \Auth::id(), // 维修员id
+                'user_id' => isset($request->user_id) ? $request->user_id : \Auth::id(), // 维修员id
                 'order_id' => $request->order_id,
                 'content' => $request->input('content') ?: '工单已完成。',
             ]);
@@ -660,4 +660,5 @@ class OrdersController extends Controller
 
         return response($date);
     }
+
 }

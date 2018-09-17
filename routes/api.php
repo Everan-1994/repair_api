@@ -160,6 +160,9 @@ $api->group([
             // 完工
             $api->post('orders/fixedOrder', 'OrdersController@fixedOrder')
                 ->name('api.order.fixedOrder');
+            // 管理者操作完工
+            $api->post('orders/fixedOrderManager', 'OrdersController@fixedOrderManager')
+                ->name('api.order.fixedOrderManager');
             // 评价
             $api->post('orders/evaluateOrder', 'OrdersController@evaluateOrder')
                 ->name('api.order.evaluateOrder');

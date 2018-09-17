@@ -134,6 +134,9 @@ $api->group([
             // 变更状态
             $api->patch('member/status', 'MembersController@changeStatus')
                 ->name('api.member.changeStatus');
+            // 删除会员
+            $api->delete('member/{user}', 'MembersController@delUser')
+                ->name('api.member.delUser');
 
             // 类型列表
             $api->get('type', 'TypesController@index')

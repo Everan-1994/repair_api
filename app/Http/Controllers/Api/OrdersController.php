@@ -23,6 +23,12 @@ class OrdersController extends Controller
 
         $order = Order::whereSchoolId($request->school_id)
             ->with(['area', 'images', 'user', 'repair'])
+            ->when($request->startTime && $request->endTime, function ($query) use ($request) {
+                return $query->whereBetween('created_at', [
+                    date('Y-m-d H:i:s', $request->startTime),
+                    date('Y-m-d ' . '23:59:59', $request->endTime),
+                ]);
+            })
             ->when($request->self > 0, function ($query) use ($user_id) {
                 return $query->where('user_id', $user_id);
             })
@@ -62,24 +68,24 @@ class OrdersController extends Controller
         $order_sn = createOrderNm();
 
         $od = $order->create([
-            'order'     => $order_sn,
+            'order' => $order_sn,
             'school_id' => $orderRequest->school_id,
-            'area_id'   => $orderRequest->area_id,
-            'type'      => $orderRequest->type,
-            'address'   => $orderRequest->address,
-            'content'   => $orderRequest->contents,
-            'user_id'   => \Auth::id(),
-            'status'    => 0,
-            'form_id'   => $orderRequest->form_id
+            'area_id' => $orderRequest->area_id,
+            'type' => $orderRequest->type,
+            'address' => $orderRequest->address,
+            'content' => $orderRequest->contents,
+            'user_id' => \Auth::id(),
+            'status' => 0,
+            'form_id' => $orderRequest->form_id,
         ]);
 
         if (!empty($orderRequest->imagesUrl)) {
             foreach ($orderRequest->imagesUrl as $val) {
                 $arr[] = [
-                    'order_id'   => $od['id'],
-                    'image_url'  => $val,
+                    'order_id' => $od['id'],
+                    'image_url' => $val,
                     'created_at' => now()->toDateTimeString(),
-                    'updated_at' => now()->toDateTimeString()
+                    'updated_at' => now()->toDateTimeString(),
                 ];
             }
             OrderImages::insert($arr);
@@ -94,30 +100,30 @@ class OrdersController extends Controller
 
         return response([
             'code' => 0,
-            'msg'  => 'success'
+            'msg' => 'success',
         ]);
 
         \DB::beginTransaction();
         try {
             $od = $order->create([
-                'order'     => $order_sn,
+                'order' => $order_sn,
                 'school_id' => $orderRequest->school_id,
-                'area_id'   => $orderRequest->area_id,
-                'type'      => $orderRequest->type,
-                'address'   => $orderRequest->address,
-                'content'   => $orderRequest->contents,
-                'user_id'   => \Auth::id(),
-                'status'    => 0,
-                'form_id'   => $orderRequest->form_id
+                'area_id' => $orderRequest->area_id,
+                'type' => $orderRequest->type,
+                'address' => $orderRequest->address,
+                'content' => $orderRequest->contents,
+                'user_id' => \Auth::id(),
+                'status' => 0,
+                'form_id' => $orderRequest->form_id,
             ]);
 
             if (!empty($orderRequest->imagesUrl)) {
                 foreach ($orderRequest->imagesUrl as $val) {
                     $arr[] = [
-                        'order_id'   => $od['id'],
-                        'image_url'  => $val,
+                        'order_id' => $od['id'],
+                        'image_url' => $val,
                         'created_at' => now()->toDateTimeString(),
-                        'updated_at' => now()->toDateTimeString()
+                        'updated_at' => now()->toDateTimeString(),
                     ];
                 }
                 OrderImages::insert($arr);
@@ -133,7 +139,7 @@ class OrdersController extends Controller
 
             return response([
                 'code' => 0,
-                'msg'  => 'success'
+                'msg' => 'success',
             ]);
         } catch (\Exception $exception) {
             \DB::rollBack();
@@ -147,21 +153,21 @@ class OrdersController extends Controller
         \DB::beginTransaction();
         try {
             $order->whereId($order['id'])->update([
-                'area_id'    => $orderRequest->area_id,
-                'type'       => $orderRequest->type,
-                'address'    => $orderRequest->address,
-                'content'    => $orderRequest->contents,
-                'status'     => 0,
-                'updated_at' => now()->toDateTimeString()
+                'area_id' => $orderRequest->area_id,
+                'type' => $orderRequest->type,
+                'address' => $orderRequest->address,
+                'content' => $orderRequest->contents,
+                'status' => 0,
+                'updated_at' => now()->toDateTimeString(),
             ]);
 
             if ($order['status'] == 1) {
                 // 新增进度
                 $orderProcess->create([
-                    'type'     => 0,
-                    'user_id'  => $order['user_id'], // 申报人
+                    'type' => 0,
+                    'user_id' => $order['user_id'], // 申报人
                     'order_id' => $order['id'],
-                    'content'  => $orderRequest->contents
+                    'content' => $orderRequest->contents,
                 ]);
             }
 
@@ -181,10 +187,10 @@ class OrdersController extends Controller
             if (!empty($orderRequest->imagesUrl)) {
                 foreach ($orderRequest->imagesUrl as $val) {
                     $arr[] = [
-                        'order_id'   => $order['id'],
-                        'image_url'  => $val,
+                        'order_id' => $order['id'],
+                        'image_url' => $val,
                         'created_at' => now()->toDateTimeString(),
-                        'updated_at' => now()->toDateTimeString()
+                        'updated_at' => now()->toDateTimeString(),
                     ];
                 }
                 OrderImages::insert($arr);
@@ -194,7 +200,7 @@ class OrdersController extends Controller
 
             return response([
                 'code' => 0,
-                'msg'  => 'success'
+                'msg' => 'success',
             ]);
         } catch (\Exception $exception) {
             \DB::rollBack();
@@ -222,7 +228,7 @@ class OrdersController extends Controller
 
         return response([
             'code' => 0,
-            'msg'  => 'Successed'
+            'msg' => 'Successed',
         ], 204);
     }
 
@@ -237,9 +243,9 @@ class OrdersController extends Controller
                 $reply = OrderProcess::create(
                     [
                         'order_id' => $request->order_id,
-                        'user_id'  => \Auth::id(),
-                        'type'     => $request->type,
-                        'content'  => $request->content
+                        'user_id' => \Auth::id(),
+                        'type' => $request->type,
+                        'content' => $request->input('content'),
                     ]
                 );
                 // 更新工单状态(已完成)
@@ -248,11 +254,11 @@ class OrdersController extends Controller
                 $reply = OrderProcess::updateOrCreate(
                     [
                         'order_id' => $request->order_id,
-                        'user_id'  => \Auth::id(),
-                        'type'     => $request->type
+                        'user_id' => \Auth::id(),
+                        'type' => $request->type,
                     ],
                     [
-                        'content' => $request->content
+                        'content' => $request->input('content'),
                     ]
                 );
                 // 更新工单状态(驳回)
@@ -323,19 +329,19 @@ class OrdersController extends Controller
                 // 新增进度
                 $orderProcess->create(
                     [
-                        'type'     => 2,
+                        'type' => 2,
                         'order_id' => $request->order_id,
-                        'content'  => '工单已受理。',
-                        'user_id'  => $request->repair_id, // 维修员id
+                        'content' => '工单已受理。',
+                        'user_id' => $request->repair_id, // 维修员id
                     ]
                 );
             } else {
                 // 新增进度 & 更新
                 $orderProcess->updateOrCreate(
                     [
-                        'type'     => 2,
+                        'type' => 2,
                         'order_id' => $request->order_id,
-                        'content'  => '工单已受理。'
+                        'content' => '工单已受理。',
                     ],
                     [
                         'user_id' => $request->repair_id, // 维修员id
@@ -345,9 +351,9 @@ class OrdersController extends Controller
 
             // 更新工单
             $order->whereId($request->order_id)->update([
-                'status'     => 2,
-                'repair_id'  => $request->repair_id,
-                'updated_at' => now()->toDateTimeString()
+                'status' => 2,
+                'repair_id' => $request->repair_id,
+                'updated_at' => now()->toDateTimeString(),
             ]);
 
             $od = $order->whereId($request->order_id)->first();
@@ -369,7 +375,7 @@ class OrdersController extends Controller
 
             return response([
                 'code' => 0,
-                'msg'  => 'Success'
+                'msg' => 'Success',
             ], 201);
 
         } catch (\Exception $exception) {
@@ -385,17 +391,17 @@ class OrdersController extends Controller
         try {
             // 新增进度
             $orderProcess->create([
-                'type'     => 3,
-                'user_id'  => \Auth::id(), // 维修员id
+                'type' => 3,
+                'user_id' => \Auth::id(), // 维修员id
                 'order_id' => $request->order_id,
-                'content'  => $request->content ?: '工单已完成。',
+                'content' => $request->input('content') ?: '工单已完成。',
             ]);
 
             // 更新工单
             $order->whereId($request->order_id)->update([
-                'status'         => 3,
+                'status' => 3,
                 'repair_form_id' => $request->form_id, // 完成工单使用
-                'updated_at'     => now()->toDateTimeString()
+                'updated_at' => now()->toDateTimeString(),
             ]);
 
             \DB::commit();
@@ -412,7 +418,7 @@ class OrdersController extends Controller
 
             return response([
                 'code' => 0,
-                'msg'  => 'success'
+                'msg' => 'success',
             ], 201);
         } catch (\Exception $exception) {
             \DB::rollBack();
@@ -426,26 +432,26 @@ class OrdersController extends Controller
         try {
             // 新增进度
             $op = $orderProcess->create([
-                'type'     => 5,
-                'user_id'  => \Auth::id(), // 用户id
+                'type' => 5,
+                'user_id' => \Auth::id(), // 用户id
                 'order_id' => $request->order_id,
-                'content'  => $request->content,
+                'content' => $request->input('content'),
             ]);
 
             // 更新工单
             $order->whereId($request->order_id)->update([
-                'status'     => 5,
-                'updated_at' => now()->toDateTimeString()
+                'status' => 5,
+                'updated_at' => now()->toDateTimeString(),
             ]);
 
             // 评价
             $evaluate->create([
-                'order_id'   => $request->order_id,
-                'ps_id'      => $op['id'],
-                'content'    => $request->content,
-                'evaluate'   => $request->evaluate,
-                'service'    => $request->sstar,
-                'efficiency' => $request->estar
+                'order_id' => $request->order_id,
+                'ps_id' => $op['id'],
+                'content' => $request->input('content'),
+                'evaluate' => $request->evaluate,
+                'service' => $request->sstar,
+                'efficiency' => $request->estar,
             ]);
 
             \DB::commit();
@@ -461,7 +467,7 @@ class OrdersController extends Controller
 
             return response([
                 'code' => 0,
-                'msg'  => 'success'
+                'msg' => 'success',
             ], 201);
         } catch (\Exception $exception) {
             \DB::rollBack();
@@ -475,26 +481,26 @@ class OrdersController extends Controller
         try {
             // 新增进度
             $op = $orderProcess->create([
-                'type'     => 4,
-                'user_id'  => \Auth::id(), // 用户id
+                'type' => 4,
+                'user_id' => \Auth::id(), // 用户id
                 'order_id' => $request->order_id,
-                'content'  => $request->content,
+                'content' => $request->input('content'),
             ]);
 
             // 更新工单
             $order->whereId($request->order_id)->update([
-                'status'     => 4,
-                'updated_at' => now()->toDateTimeString()
+                'status' => 4,
+                'updated_at' => now()->toDateTimeString(),
             ]);
 
             // 申述图片
             if (!empty($request->imagesUrl)) {
                 foreach ($request->imagesUrl as $val) {
                     $arr[] = [
-                        'ps_id'      => $op['id'],
-                        'image_url'  => $val,
+                        'ps_id' => $op['id'],
+                        'image_url' => $val,
                         'created_at' => now()->toDateTimeString(),
-                        'updated_at' => now()->toDateTimeString()
+                        'updated_at' => now()->toDateTimeString(),
                     ];
                 }
                 $statement->insert($arr);
@@ -504,7 +510,7 @@ class OrdersController extends Controller
 
             return response([
                 'code' => 0,
-                'msg'  => 'success'
+                'msg' => 'success',
             ], 201);
         } catch (\Exception $exception) {
             \DB::rollBack();
@@ -546,7 +552,7 @@ class OrdersController extends Controller
         $data = [
             'hp' => 0,
             'zp' => 0,
-            'cp' => 0
+            'cp' => 0,
         ];
 
         foreach ($list as $k => $eva) {
@@ -631,7 +637,7 @@ class OrdersController extends Controller
                     } else {
                         $data[$c][$k] = [
                             'times' => $w,
-                            'count' => 0
+                            'count' => 0,
                         ];
                     }
                 }
@@ -644,8 +650,8 @@ class OrdersController extends Controller
                 }
 
                 $date[$k] = [
-                    'day'   => $v[0]['times'],
-                    'count' => array_sum($sum[$k])
+                    'day' => $v[0]['times'],
+                    'count' => array_sum($sum[$k]),
                 ];
             }
         } else {

@@ -39,18 +39,18 @@ class MembersController extends Controller
         if ($hasOrder) {
             return response([
                 'code' => 1,
-                'msg'  => '该用户已存在工单关系，请先删除后再试。'
+                'msg' => '该用户已存在工单关系，请先删除后再试。',
             ], 400);
         }
 
         User::whereId($request->user_id)->update([
             'identify' => $request->identify,
-            'truename' => $request->repair_name
+            'truename' => $request->repair_name,
         ]);
 
         return response([
             'code' => 0,
-            'msg'  => '更新成功'
+            'msg' => '更新成功',
         ]);
     }
 
@@ -60,17 +60,26 @@ class MembersController extends Controller
 
         return response([
             'code' => 0,
-            'msg'  => '更新成功'
+            'msg' => '更新成功',
         ]);
     }
 
     public function delUser(User $user)
     {
+        $hasOrder = Order::whereUserId($user->id)->orWhere('repair_id', $user->id)->exists(); // 存在工单
+
+        if ($hasOrder) {
+            return response([
+                'code' => 1,
+                'msg' => '该用户已存在工单关系，请先删除后再试。',
+            ], 400);
+        }
+
         $user->delete();
 
         return response([
             'code' => 0,
-            'msg'  => '删除成功'
+            'msg' => '删除成功',
         ]);
     }
 }

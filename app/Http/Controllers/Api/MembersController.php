@@ -18,6 +18,9 @@ class MembersController extends Controller
             ->when(isset($request->truename), function ($query) use ($request) {
                 return $query->where('truename', 'like', '%' . $request->truename . '%');
             })
+            ->when(isset($request->phone), function ($query) use ($request) {
+                return $query->where('phone', preg_replace('# #','',$request->phone));
+            })
             ->whereIdentify($request->identify)
             ->orderBy($request->order ?: 'created_at', $request->sort ?: 'desc')
             ->paginate($request->pageSize ?: 10, ['*'], 'page', $request->page ?: 1);

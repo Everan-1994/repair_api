@@ -10,7 +10,7 @@ class TypesController extends Controller
 {
     public function index(Request $request)
     {
-        $type = Type::paginate($request->pageSize ?: 10, ['*'], 'page', $request->page ?: 1);
+        $type = Type::whereSchoolId($request->school_id)->paginate($request->pageSize ?: 10, ['*'], 'page', $request->page ?: 1);
 
         return TypeResource::collection($type);
     }

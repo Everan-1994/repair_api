@@ -32,6 +32,9 @@ class OrdersController extends Controller
             ->when($request->self > 0, function ($query) use ($user_id) {
                 return $query->where('user_id', $user_id);
             })
+            ->when($request->status == 1, function ($query) use ($request) {
+                return $query->with('processes');
+            })
             ->when(isset($request->status), function ($query) use ($request) {
                 if ($request->self > 0) {
                     switch ($request->status) {
@@ -245,7 +248,7 @@ class OrdersController extends Controller
                         'order_id' => $request->order_id,
                         'user_id' => \Auth::id(),
                         'type' => $request->type,
-                        'content' => $request->input('content'),
+                        'content' => $request->input('content') || '描述不清楚。',
                     ]
                 );
                 // 更新工单状态(已完成)
